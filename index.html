@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Зони зберігання — Контроль продуктів</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf7f0;
+    --parchment: #f2ead8;
+    --warm-white: #fffef9;
+    --ink: #1a1510;
+    --brown: #3d2b1a;
+    --amber: #c8702a;
+    --amber-light: #e8944a;
+    --sage: #5a7a5c;
+    --sage-light: #7aaa7d;
+    --red: #c0392b;
+    --red-light: #e74c3c;
+    --gold: #b8943a;
+    --gold-light: #d4aa50;
+    --blue-cold: #2e6b9e;
+    --blue-light: #4a8fc0;
+    --border: rgba(61,43,26,0.12);
+    --shadow: 0 4px 24px rgba(26,21,16,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Subtle grain texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--brown);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 14px;
+  }
+
+  .logo-emblem {
+    font-size: 26px; line-height: 1;
+  }
+
+  .logo-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--parchment);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .logo-text p {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-top: 2px;
+  }
+
+  .header-right {
+    display: flex; align-items: center; gap: 24px;
+  }
+
+  #clock {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--parchment);
+    letter-spacing: 2px;
+  }
+
+  #date-disp {
+    font-size: 12px;
+    color: var(--gold-light);
+    font-weight: 400;
+  }
+
+  /* MAIN */
+  .page {
+    position: relative; z-index: 1;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  /* PAGE TITLE */
+  .page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--brown);
+    line-height: 1;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+    color: var(--amber);
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* STAT CARDS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(26,21,16,0.12); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--amber);
+  }
+
+  .stat-card.s-cold::before { background: var(--blue-cold); }
+  .stat-card.s-warn::before { background: var(--gold); }
+  .stat-card.s-danger::before { background: var(--red); }
+  .stat-card.s-ok::before { background: var(--sage); }
+
+  .stat-icon { font-size: 22px; margin-bottom: 8px; }
+  .stat-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+  .stat-val { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--ink); line-height: 1; }
+  .stat-card.s-warn .stat-val { color: var(--gold); }
+  .stat-card.s-danger .stat-val { color: var(--red); }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--parchment);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .card-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--brown);
+  }
+
+  .card-header .icon { font-size: 18px; }
+
+  .card-body { padding: 20px; }
+
+  /* FORM */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .fg { margin-bottom: 12px; }
+
+  .fg label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 5px;
+  }
+
+  .fg input, .fg select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .fg input:focus, .fg select:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(200,112,42,0.12);
+    background: var(--warm-white);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 11px;
+    background: var(--brown);
+    color: var(--parchment);
+    border: none;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  .btn:hover {
+    background: var(--amber);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(200,112,42,0.3);
+  }
+
+  .btn.btn-sm {
+    width: auto;
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
+
+  .btn.btn-outline-red {
+    background: transparent;
+    border: 1.5px solid #e8d5d5;
+    color: var(--red);
+  }
+  .btn.btn-outline-red:hover { background: var(--red); color: #fff; box-shadow: 0 4px 16px rgba(192,57,43,0.3); }
+
+  .btn.btn-outline-gold {
+    background: transparent;
+    border: 1.5px solid #e8dfc8;
+    color: var(--gold);
+  }
+  .btn.btn-outline-gold:hover { background: var(--gold); color: #fff; box-shadow: 0 4px 16px rgba(184,148,58,0.3); }
+
+  /* ZONE TABS */
+  .zone-tabs {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .ztab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: #888;
+    font-family: 'DM Sans';
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .ztab:hover { border-color: var(--amber); color: var(--amber); }
+  .ztab.active { background: var(--brown); border-color: var(--brown); color: var(--parchment); }
+
+  /* SEARCH */
+  .search-bar {
+    position: relative; margin-bottom: 14px;
+  }
+
+  .search-bar input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans'; font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-bar input:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(200,112,42,0.1);
+    background: var(--warm-white);
+  }
+
+  .search-bar .s-icon {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; pointer-events: none;
+  }
+
+  /* FILTER PILLS */
+  .filter-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label { font-size: 11px; font-weight: 600; color: #aaa; letter-spacing: 1px; }
+
+  .fpill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: #777;
+    font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .fpill:hover { border-color: var(--amber); color: var(--amber); }
+  .fpill.active { background: var(--red-light); border-color: var(--red-light); color: #fff; }
+  .fpill.active.warn { background: var(--gold); border-color: var(--gold); }
+  .fpill.active.expire { background: #e67e22; border-color: #e67e22; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+  thead { background: var(--parchment); }
+
+  thead th {
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th:hover { color: var(--amber); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+    animation: rowIn 0.25s ease;
+  }
+
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  tbody tr:hover { background: rgba(200,112,42,0.04); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td { padding: 12px 14px; vertical-align: middle; }
+
+  .prod-name {
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+  }
+
+  .prod-cat {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 2px;
+  }
+
+  /* Zone badges */
+  .zbadge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .z-cold   { background: #ddeef8; color: var(--blue-cold); }
+  .z-freeze { background: #dde8f5; color: #1a4a7a; }
+  .z-dry    { background: #f5edda; color: var(--gold); }
+  .z-bar    { background: #fde9d9; color: var(--amber); }
+  .z-kitchen{ background: #e8f5e8; color: var(--sage); }
+  .z-wine   { background: #f5e0e8; color: #a0304a; }
+
+  /* Qty */
+  .qty-wrap { text-align: right; }
+  .qty-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .qty-num.low { color: var(--gold); }
+  .qty-num.empty { color: var(--red); }
+  .qty-unit { font-size: 10px; color: #aaa; font-weight: 500; }
+
+  /* Expiry */
+  .expiry-cell { font-size: 12px; white-space: nowrap; }
+  .exp-ok { color: var(--sage); font-weight: 600; }
+  .exp-soon { color: #e67e22; font-weight: 700; }
+  .exp-expired { color: var(--red); font-weight: 700; }
+  .exp-none { color: #ccc; }
+
+  .exp-days {
+    font-size: 10px;
+    margin-top: 2px;
+    display: block;
+  }
+
+  /* Status */
+  .sbadge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .sb-ok { background: #e8f5e8; color: var(--sage); }
+  .sb-low { background: #fef5e0; color: var(--gold); }
+  .sb-empty { background: #fde8e8; color: var(--red); }
+  .sb-expire { background: #fde8cc; color: #c0601a; }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-ok { background: var(--sage); animation: blink 3s infinite; }
+  .dot-low { background: var(--gold); animation: blink 2s infinite; }
+  .dot-empty { background: var(--red); animation: blink 1s infinite; }
+  .dot-expire { background: #e67e22; animation: blink 1.5s infinite; }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .row-actions { display: flex; gap: 5px; align-items: center; }
+
+  /* Empty */
+  .empty-state {
+    text-align: center;
+    padding: 60px;
+    color: #ccc;
+  }
+
+  .empty-state .e-icon { font-size: 52px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state p { font-size: 14px; letter-spacing: 1px; }
+
+  /* MODAL */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,21,16,0.5);
+    backdrop-filter: blur(6px);
+    z-index: 999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--warm-white);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    width: 480px; max-width: 95vw;
+    max-height: 90vh; overflow-y: auto;
+    transform: scale(0.96) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .overlay.open .modal { transform: scale(1) translateY(0); }
+
+  .modal-head {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--parchment);
+    border-radius: 12px 12px 0 0;
+  }
+
+  .modal-head h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--brown);
+  }
+
+  .modal-body { padding: 24px; }
+
+  .modal-foot {
+    display: flex; gap: 8px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .modal-foot .btn { flex: 1; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: #888;
+  }
+
+  .btn-ghost:hover { background: var(--parchment); box-shadow: none; transform: none; border-color: #ccc; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--brown);
+    color: var(--parchment);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 9999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transform: translateY(80px) scale(0.95);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 320px;
+    border-left: 4px solid var(--amber);
+  }
+
+  .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+  .toast.err { border-left-color: var(--red); }
+  .toast.ok { border-left-color: var(--sage); }
+
+  /* PROGRESS BAR */
+  .qty-bar {
+    height: 3px;
+    background: #e8e0d0;
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+
+  .qty-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  @media (max-width: 1024px) {
+    .layout { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    header { padding: 0 16px; }
+    .page { padding: 16px 12px; }
+  }
+
+  /* ===== ORDER FLAGS ===== */
+  .order-col { text-align: center; white-space: nowrap; }
+
+  .flag-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .flag-btn:hover { transform: scale(1.15); }
+
+  .flag-btn.soon-active {
+    background: #fef5e0;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(184,148,58,0.2);
+  }
+
+  .flag-btn.urgent-active {
+    background: #fde8e8;
+    border-color: var(--red);
+    box-shadow: 0 0 0 2px rgba(192,57,43,0.2);
+    animation: pulse-urgent 1.5s infinite;
+  }
+
+  @keyframes pulse-urgent {
+    0%,100% { box-shadow: 0 0 0 2px rgba(192,57,43,0.2); }
+    50%      { box-shadow: 0 0 0 5px rgba(192,57,43,0.08); }
+  }
+
+  .order-qty-inp {
+    width: 64px;
+    padding: 5px 7px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .order-qty-inp:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(200,112,42,0.12);
+    background: var(--warm-white);
+  }
+
+  .order-qty-inp.has-val { border-color: var(--sage); background: #f0faf0; }
+
+  .flags-wrap { display: flex; align-items: center; gap: 5px; }
+
+  /* Telegram send bar */
+  .tg-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    background: var(--parchment);
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 10px 10px;
+    flex-wrap: wrap;
+  }
+
+  .tg-bar-label {
+    font-size: 12px; font-weight: 600; color: var(--brown);
+    flex-shrink: 0;
+  }
+
+  .tg-count {
+    display: flex; gap: 8px; flex: 1;
+  }
+
+  .tg-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 700;
+  }
+
+  .tg-badge.urgent { background: #fde8e8; color: var(--red); }
+  .tg-badge.soon   { background: #fef5e0; color: var(--gold); }
+
+  .btn-tg {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px;
+    background: #2b5278;
+    color: #fff;
+    border: none; border-radius: 7px;
+    font-family: 'DM Sans'; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-tg:hover { background: #3a6fa8; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(43,82,120,0.35); }
+  .btn-tg svg { width: 16px; height: 16px; fill: currentColor; }
+
+  .btn-tg-settings {
+    background: transparent;
+    border: 1.5px solid #c8d8e8;
+    color: #6a90b0;
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-tg-settings:hover { background: #edf3f8; border-color: #2b5278; color: #2b5278; }
+
+  /* Telegram settings modal */
+  .tg-settings-box {
+    background: #edf3f8;
+    border: 1px solid #c8d8e8;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .tg-settings-box label { color: #3a6090; }
+  .tg-settings-box input { background: #fff; border-color: #c8d8e8; }
+  .tg-settings-box input:focus { border-color: #2b5278; box-shadow: 0 0 0 3px rgba(43,82,120,0.1); }
+
+  /* Order preview in tg modal */
+  .order-preview {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #333;
+    max-height: 280px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    border: 1px solid #ddd;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-emblem">🐑</div>
+    <div class="logo-text">
+      <h1>Зони зберігання</h1>
+      <p>Контроль продуктів · Ресторан</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,0.06);">
+      <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--gold-light);display:inline-block;flex-shrink:0;animation:blink-sync 1.5s infinite;transition:background 0.4s;"></span>
+      <span id="sync-label" style="font-size:11px;font-weight:600;color:var(--gold-light);letter-spacing:1px;white-space:nowrap;">Підключення...</span>
+    </div>
+    <div>
+      <div id="clock">--:--:--</div>
+      <div id="date-disp" style="font-size:11px;color:var(--gold-light);text-align:right;margin-top:1px;"></div>
+    </div>
+  </div>
+</header>
+<style>@keyframes blink-sync{0%,100%{opacity:1}50%{opacity:0.4}}</style>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Зони зберігання</div>
+      <div class="page-subtitle">Актуальний стан запасів</div>
+    </div>
+    <button class="btn" style="width:auto;padding:10px 20px;" onclick="document.getElementById('add-modal').classList.add('open')">
+      + Додати продукт
+    </button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-label">Всього позицій</div>
+      <div class="stat-val" id="s-total">0</div>
+    </div>
+    <div class="stat-card s-cold">
+      <div class="stat-icon">🌡️</div>
+      <div class="stat-label">Зон зберігання</div>
+      <div class="stat-val" id="s-zones">0</div>
+    </div>
+    <div class="stat-card s-warn">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-label">Малий запас</div>
+      <div class="stat-val" id="s-low">0</div>
+    </div>
+    <div class="stat-card s-danger">
+      <div class="stat-icon">🚨</div>
+      <div class="stat-label">Закінчується термін</div>
+      <div class="stat-val" id="s-expire">0</div>
+    </div>
+    <div class="stat-card s-danger">
+      <div class="stat-icon">❌</div>
+      <div class="stat-label">Відсутні</div>
+      <div class="stat-val" id="s-empty">0</div>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- LEFT: ZONES overview -->
+    <div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-header"><span class="icon">🗺️</span><h2>Зони зберігання</h2></div>
+        <div class="card-body" style="padding:14px;">
+          <div id="zone-overview"></div>
+        </div>
+      </div>
+
+      <!-- Quick adjust -->
+      <div class="card">
+        <div class="card-header"><span class="icon">⚡</span><h2>Швидке коригування</h2></div>
+        <div class="card-body">
+          <div class="fg">
+            <label>Назва або артикул продукту</label>
+            <input type="text" id="adj-q" placeholder="Почніть вводити..." oninput="suggestAdj()" autocomplete="off" />
+            <div id="adj-suggestions" style="position:relative;"></div>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Операція</label>
+              <select id="adj-op">
+                <option value="add">➕ Прихід</option>
+                <option value="sub">➖ Витрата</option>
+                <option value="set">📋 Встановити</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Кількість</label>
+              <input type="number" id="adj-val" placeholder="0" min="0" />
+            </div>
+          </div>
+          <button class="btn" onclick="doAdjust()">Застосувати зміну</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: TABLE -->
+    <div class="card">
+      <div class="card-header"><span class="icon">📋</span><h2>Список продуктів</h2></div>
+      <div class="card-body" style="padding-bottom:0;">
+
+        <div class="search-bar">
+          <span class="s-icon">🔍</span>
+          <input type="text" id="search-inp" placeholder="Пошук продукту, категорії, артикулу..." oninput="renderTable()" />
+        </div>
+
+        <div class="zone-tabs" id="zone-tabs">
+          <button class="ztab active" data-z="all" onclick="setZone(this)">Всі зони</button>
+          <button class="ztab" data-z="Холодильник заготівельний" onclick="setZone(this)">❄️ Холодильник заготівельний</button>
+          <button class="ztab" data-z="Морозилка заготівельний + ларь" onclick="setZone(this)">🧊 Морозилка заготівельний + ларь</button>
+          <button class="ztab" data-z="Сухий склад" onclick="setZone(this)">📦 Сухий склад</button>
+        </div>
+
+        <div class="filter-row">
+          <span class="filter-label">ФІЛЬТР:</span>
+          <button class="fpill expire" onclick="toggleFilter(this,'expire')" data-f="expire">🕐 Термін спливає</button>
+          <button class="fpill warn" onclick="toggleFilter(this,'low')" data-f="low">⚠️ Малий запас</button>
+          <button class="fpill" onclick="toggleFilter(this,'empty')" data-f="empty">❌ Відсутні</button>
+        </div>
+
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('name')">Продукт ↕</th>
+              <th onclick="sortBy('zone')">Зона ↕</th>
+              <th onclick="sortBy('qty')" style="text-align:right">Кількість ↕</th>
+              <th onclick="sortBy('expiry')">Термін придат. ↕</th>
+              <th>Статус</th>
+              <th style="text-align:center">Замовлення</th>
+              <th style="text-align:center;min-width:80px">Замов. кільк.</th>
+              <th>Дії</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div id="empty-st" class="empty-state" style="display:none;">
+          <div class="e-icon">🥗</div>
+          <p>Продуктів не знайдено</p>
+        </div>
+      </div>
+
+      <!-- Telegram send bar -->
+      <div class="tg-bar" id="tg-bar">
+        <span class="tg-bar-label">📋 До замовлення:</span>
+        <div class="tg-count">
+          <span class="tg-badge urgent" id="tg-urgent-count" style="display:none">🚨 <span id="tg-uc">0</span> термінових</span>
+          <span class="tg-badge soon" id="tg-soon-count" style="display:none">⚠️ <span id="tg-sc">0</span> найближчих</span>
+          <span id="tg-none-label" style="font-size:12px;color:#aaa;">Немає відміток</span>
+        </div>
+        <button class="btn-tg-settings" onclick="openTgSettings()">⚙️ Налаштування</button>
+        <button class="btn-tg" onclick="openTgSend()" id="btn-send-tg" disabled style="opacity:0.4;">
+          <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+          Відправити в Telegram
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>➕ Додати продукт</h3>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label>Назва продукту *</label><input type="text" id="a-name" placeholder="напр. Куряче філе" /></div>
+      <div class="form-row">
+        <div class="fg"><label>Артикул</label><input type="text" id="a-sku" placeholder="напр. CHKN-FLT" /></div>
+        <div class="fg"><label>Категорія</label>
+          <select id="a-cat">
+            <option>М'ясо та птиця</option><option>Риба та морепродукти</option>
+            <option>Овочі та фрукти</option><option>Молочні продукти</option>
+            <option>Яйця</option><option>Крупи та борошно</option>
+            <option>Консерви та соуси</option><option>Спеції та приправи</option>
+            <option>Алкоголь</option><option>Безалкогольні напої</option>
+            <option>Хліб та випічка</option><option>Заморожені продукти</option>
+            <option>Олії та жири</option><option>Інше</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Зона зберігання *</label>
+          <select id="a-zone">
+            <option>Холодильник заготівельний</option><option>Морозилка заготівельний + ларь</option>
+            <option>Сухий склад</option>
+          </select>
+        </div>
+        <div class="fg"><label>Одиниця виміру</label>
+          <select id="a-unit">
+            <option value="кг">кг</option><option value="г">г</option>
+            <option value="л">л</option><option value="мл">мл</option>
+            <option value="шт">шт</option><option value="упак">упак</option>
+            <option value="пляш">пляш</option><option value="пач">пач</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Кількість *</label><input type="number" id="a-qty" placeholder="0" min="0" step="0.1" /></div>
+        <div class="fg"><label>Мінімальний запас</label><input type="number" id="a-min" placeholder="5" min="0" step="0.1" /></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Термін придатності</label><input type="date" id="a-exp" /></div>
+        <div class="fg"><label>Постачальник</label><input type="text" id="a-sup" placeholder="напр. АТБ, Metro" /></div>
+      </div>
+      <div class="fg"><label>Примітка</label><input type="text" id="a-note" placeholder="Додаткова інформація..." /></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModals()">Скасувати</button>
+      <button class="btn" onclick="addItem()">Додати продукт</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>✏️ Редагувати продукт</h3></div>
+    <div class="modal-body">
+      <input type="hidden" id="e-id" />
+      <div class="fg"><label>Назва продукту</label><input type="text" id="e-name" /></div>
+      <div class="form-row">
+        <div class="fg"><label>Артикул</label><input type="text" id="e-sku" /></div>
+        <div class="fg"><label>Категорія</label>
+          <select id="e-cat">
+            <option>М'ясо та птиця</option><option>Риба та морепродукти</option>
+            <option>Овочі та фрукти</option><option>Молочні продукти</option>
+            <option>Яйця</option><option>Крупи та борошно</option>
+            <option>Консерви та соуси</option><option>Спеції та приправи</option>
+            <option>Алкоголь</option><option>Безалкогольні напої</option>
+            <option>Хліб та випічка</option><option>Заморожені продукти</option>
+            <option>Олії та жири</option><option>Інше</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Зона</label>
+          <select id="e-zone">
+            <option>Холодильник заготівельний</option><option>Морозилка заготівельний + ларь</option>
+            <option>Сухий склад</option>
+          </select>
+        </div>
+        <div class="fg"><label>Одиниця виміру</label>
+          <select id="e-unit">
+            <option value="кг">кг</option><option value="г">г</option>
+            <option value="л">л</option><option value="мл">мл</option>
+            <option value="шт">шт</option><option value="упак">упак</option>
+            <option value="пляш">пляш</option><option value="пач">пач</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Кількість</label><input type="number" id="e-qty" min="0" step="0.1" /></div>
+        <div class="fg"><label>Мінімальний запас</label><input type="number" id="e-min" min="0" step="0.1" /></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Термін придатності</label><input type="date" id="e-exp" /></div>
+        <div class="fg"><label>Постачальник</label><input type="text" id="e-sup" /></div>
+      </div>
+      <div class="fg"><label>Примітка</label><input type="text" id="e-note" /></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModals()">Скасувати</button>
+      <button class="btn" onclick="saveEdit()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<!-- TELEGRAM SETTINGS MODAL -->
+<div class="overlay" id="tg-settings-modal">
+  <div class="modal">
+    <div class="modal-head" style="background:#edf3f8;border-bottom:1px solid #c8d8e8;">
+      <h3 style="color:#2b5278;">⚙️ Налаштування Telegram</h3>
+      <p style="font-size:12px;color:#6a90b0;margin-top:4px;">Бот надсилатиме повідомлення у вказаний чат/групу</p>
+    </div>
+    <div class="modal-body">
+      <div class="tg-settings-box">
+        <div class="fg">
+          <label>Bot Token</label>
+          <input type="text" id="tg-token" placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ" />
+          <div style="font-size:10px;color:#aaa;margin-top:4px;">Отримайте у @BotFather → /newbot</div>
+        </div>
+        <div class="fg" style="margin-bottom:0;">
+          <label>Chat ID</label>
+          <input type="text" id="tg-chatid" placeholder="-1001234567890 або @назва_групи" />
+          <div style="font-size:10px;color:#aaa;margin-top:4px;">Додайте бота до чату/групи. ID можна дізнатись через @userinfobot</div>
+        </div>
+      </div>
+      <div id="tg-test-result" style="display:none;padding:10px 14px;border-radius:6px;font-size:12px;font-weight:600;margin-bottom:12px;"></div>
+    </div>
+    <div class="modal-foot" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-ghost" onclick="closeModals()">Закрити</button>
+      <button class="btn" style="background:#6a90b0;" onclick="testTelegram()">🔗 Тест з'єднання</button>
+      <button class="btn" style="background:#2b5278;" onclick="saveTgSettings()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<!-- TELEGRAM SEND MODAL -->
+<div class="overlay" id="tg-send-modal">
+  <div class="modal" style="width:560px;">
+    <div class="modal-head" style="background:#edf3f8;border-bottom:1px solid #c8d8e8;">
+      <h3 style="color:#2b5278;">📤 Відправити замовлення в Telegram</h3>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <span class="tg-badge urgent" id="tg-modal-urgent" style="font-size:12px;padding:5px 12px;"></span>
+        <span class="tg-badge soon" id="tg-modal-soon" style="font-size:12px;padding:5px 12px;"></span>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Попередній перегляд повідомлення:</div>
+      <div class="order-preview" id="tg-preview"></div>
+      <div id="tg-send-result" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;font-weight:600;margin-top:12px;"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModals()">Скасувати</button>
+      <button class="btn" style="background:#2b5278;" onclick="sendToTelegram()" id="btn-do-send">
+        <svg style="width:15px;height:15px;fill:currentColor;vertical-align:-2px;" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+        Надіслати
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, remove, onValue, push, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// ===== FIREBASE CONFIG =====
+const firebaseConfig = {
+  apiKey: "AIzaSyA7hBzF8zx84X1kXcfTDvaWKWZBFQ-U0gk",
+  authDomain: "baranchik-checklist.firebaseapp.com",
+  databaseURL: "https://baranchik-checklist-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "baranchik-checklist",
+  storageBucket: "baranchik-checklist.firebasestorage.app",
+  messagingSenderId: "374378353806",
+  appId: "1:374378353806:web:d3cdfca5e89fc80eece5df",
+  measurementId: "G-GW64E8FBC8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const itemsRef = ref(db, 'storage/items');
+
+// ===== STATE =====
+let items = [];
+let curZone = 'all';
+let sortF = 'name', sortD = 1;
+let activeFilters = new Set();
+let adjTarget = null;
+let isLoaded = false;
+
+// Order flags stored locally (no need to sync to Firebase — per-session workflow)
+// key: fbKey → { flag: 'soon'|'urgent'|null, orderQty: number }
+let orderFlags = JSON.parse(localStorage.getItem('order_flags') || '{}');
+
+// Telegram settings
+let tgToken = localStorage.getItem('tg_token') || '';
+let tgChatId = localStorage.getItem('tg_chatid') || '';
+
+const ZONES = {
+  'Холодильник заготівельний': { icon: '❄️', cls: 'z-cold', temp: '+2°C до +6°C' },
+  'Морозилка заготівельний + ларь': { icon: '🧊', cls: 'z-freeze', temp: '-18°C' },
+  'Сухий склад': { icon: '📦', cls: 'z-dry', temp: '+15°C до +20°C' },
+};
+
+// ===== SYNC STATUS =====
+function setStatus(state) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  if (!dot) return;
+  const map = {
+    online:      { bg: '#5a7a5c', text: '● Синхронізовано' },
+    connecting:  { bg: '#b8943a', text: '◌ Підключення...' },
+    offline:     { bg: '#c0392b', text: '✕ Немає з\'єднання' },
+  };
+  const s = map[state] || map.offline;
+  dot.style.background = s.bg;
+  label.textContent = s.text;
+}
+
+// ===== CLOCK =====
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent = n.toLocaleTimeString('uk-UA');
+  document.getElementById('date-disp').textContent = n.toLocaleDateString('uk-UA', { weekday: 'long', day: '2-digit', month: 'long' });
+}
+setInterval(tick, 1000); tick();
+
+// ===== EXPIRY =====
+function daysLeft(expStr) {
+  if (!expStr) return null;
+  return Math.ceil((new Date(expStr) - new Date()) / 86400000);
+}
+function expiryStatus(expStr) {
+  const d = daysLeft(expStr);
+  if (d === null) return null;
+  if (d < 0) return 'expired';
+  if (d <= 3) return 'soon';
+  return 'ok';
+}
+
+// ===== FIREBASE LISTENER =====
+setStatus('connecting');
+onValue(itemsRef, (snapshot) => {
+  const data = snapshot.val();
+  items = data ? Object.entries(data).map(([fbKey, val]) => ({ ...val, fbKey })) : [];
+  if (!isLoaded && items.length === 0) seedSampleData();
+  isLoaded = true;
+  setStatus('online');
+  renderAll();
+}, () => setStatus('offline'));
+
+// ===== SEED SAMPLE DATA =====
+function seedSampleData() {
+  const d = (offset) => { const dt = new Date(); dt.setDate(dt.getDate() + offset); return dt.toISOString().slice(0,10); };
+  const samples = [
+    { name: 'Куряче філе', sku: 'CHKN-FLT', category: "М'ясо та птиця", zone: 'Холодильник заготівельний', unit: 'кг', qty: 8.5, minQty: 5, expiry: d(2), supplier: 'Наша Ряба', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Яловичина (ребра)', sku: 'BEEF-RIB', category: "М'ясо та птиця", zone: 'Холодильник заготівельний', unit: 'кг', qty: 3.2, minQty: 4, expiry: d(1), supplier: 'Мясна крамниця', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Лосось філе', sku: 'SALM-FLT', category: 'Риба та морепродукти', zone: 'Холодильник заготівельний', unit: 'кг', qty: 0, minQty: 3, expiry: d(3), supplier: 'АкваМаркет', note: 'Замовити терміново', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Молоко 3.2%', sku: 'MILK-32', category: 'Молочні продукти', zone: 'Холодильник заготівельний', unit: 'л', qty: 12, minQty: 5, expiry: d(5), supplier: 'Яготинське', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Яйця С1', sku: 'EGG-C1', category: 'Яйця', zone: 'Холодильник заготівельний', unit: 'шт', qty: 120, minQty: 50, expiry: d(14), supplier: 'Птахофабрика', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Куряче філе (морожене)', sku: 'CHKN-FRZ', category: 'Заморожені продукти', zone: 'Морозилка заготівельний + ларь', unit: 'кг', qty: 25, minQty: 10, expiry: d(60), supplier: 'Наша Ряба', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Морозиво ванільне', sku: 'ICE-VNL', category: 'Заморожені продукти', zone: 'Морозилка заготівельний + ларь', unit: 'кг', qty: 6, minQty: 3, expiry: d(90), supplier: 'Рудь', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Борошно пшеничне в/с', sku: 'FLWR-WH', category: 'Крупи та борошно', zone: 'Сухий склад', unit: 'кг', qty: 50, minQty: 20, expiry: d(120), supplier: 'Metro', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Цукор білий', sku: 'SUGR-WH', category: 'Крупи та борошно', zone: 'Сухий склад', unit: 'кг', qty: 30, minQty: 10, expiry: d(365), supplier: 'Metro', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Оливкова олія', sku: 'OIL-OLV', category: 'Олії та жири', zone: 'Сухий склад', unit: 'л', qty: 8, minQty: 5, expiry: d(180), supplier: 'Metro', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Соус соєвий', sku: 'SOY-SCE', category: 'Консерви та соуси', zone: 'Сухий склад', unit: 'л', qty: 2, minQty: 3, expiry: d(200), supplier: 'АТБ', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+  ];
+  samples.forEach(item => push(itemsRef, item));
+}
+
+// ===== ORDER FLAGS =====
+function saveFlags() { localStorage.setItem('order_flags', JSON.stringify(orderFlags)); }
+
+window.toggleFlag = function(fbKey, type) {
+  if (!orderFlags[fbKey]) orderFlags[fbKey] = { flag: null, orderQty: '' };
+  const current = orderFlags[fbKey].flag;
+  // Toggle: same flag → off, different → switch
+  orderFlags[fbKey].flag = (current === type) ? null : type;
+  saveFlags();
+  renderAll();
+};
+
+window.setOrderQty = function(fbKey, val) {
+  if (!orderFlags[fbKey]) orderFlags[fbKey] = { flag: null, orderQty: '' };
+  orderFlags[fbKey].orderQty = val;
+  saveFlags();
+  updateTgBar();
+};
+
+function getFlaggedItems() {
+  return items
+    .filter(it => orderFlags[it.fbKey] && orderFlags[it.fbKey].flag)
+    .map(it => ({ ...it, flag: orderFlags[it.fbKey].flag, orderQty: orderFlags[it.fbKey].orderQty || '' }));
+}
+
+function updateTgBar() {
+  const flagged = getFlaggedItems();
+  const urgent = flagged.filter(i => i.flag === 'urgent');
+  const soon = flagged.filter(i => i.flag === 'soon');
+
+  const ucEl = document.getElementById('tg-uc');
+  const scEl = document.getElementById('tg-sc');
+  const ubadge = document.getElementById('tg-urgent-count');
+  const sbadge = document.getElementById('tg-soon-count');
+  const noneLabel = document.getElementById('tg-none-label');
+  const sendBtn = document.getElementById('btn-send-tg');
+
+  if (ucEl) ucEl.textContent = urgent.length;
+  if (scEl) scEl.textContent = soon.length;
+  if (ubadge) ubadge.style.display = urgent.length ? 'inline-flex' : 'none';
+  if (sbadge) sbadge.style.display = soon.length ? 'inline-flex' : 'none';
+  if (noneLabel) noneLabel.style.display = flagged.length ? 'none' : 'inline';
+  if (sendBtn) { sendBtn.disabled = flagged.length === 0; sendBtn.style.opacity = flagged.length ? '1' : '0.4'; }
+}
+
+// ===== ADD / DELETE / EDIT / ADJUST =====
+window.addItem = function() {
+  const name = document.getElementById('a-name').value.trim();
+  const qty = parseFloat(document.getElementById('a-qty').value);
+  if (!name) { showToast('Введіть назву продукту!', 'err'); return; }
+  if (isNaN(qty)) { showToast('Введіть кількість!', 'err'); return; }
+  const newItem = {
+    name, sku: document.getElementById('a-sku').value.trim() || '',
+    category: document.getElementById('a-cat').value,
+    zone: document.getElementById('a-zone').value,
+    unit: document.getElementById('a-unit').value, qty,
+    minQty: parseFloat(document.getElementById('a-min').value) || 0,
+    expiry: document.getElementById('a-exp').value || '',
+    supplier: document.getElementById('a-sup').value.trim() || '',
+    note: document.getElementById('a-note').value.trim() || '',
+    addedAt: new Date().toLocaleDateString('uk-UA')
+  };
+  push(itemsRef, newItem)
+    .then(() => { closeModals(); showToast(`✓ "${name}" додано до ${newItem.zone}`, 'ok'); ['a-name','a-sku','a-qty','a-min','a-exp','a-sup','a-note'].forEach(id => document.getElementById(id).value = ''); })
+    .catch(e => showToast('Помилка: ' + e.message, 'err'));
+};
+
+window.deleteItem = function(fbKey) {
+  const it = items.find(i => i.fbKey === fbKey);
+  if (!confirm(`Видалити "${it.name}" зі списку?`)) return;
+  delete orderFlags[fbKey]; saveFlags();
+  remove(ref(db, 'storage/items/' + fbKey))
+    .then(() => showToast(`Видалено: ${it.name}`))
+    .catch(e => showToast('Помилка: ' + e.message, 'err'));
+};
+
+window.openEdit = function(fbKey) {
+  const it = items.find(i => i.fbKey === fbKey);
+  document.getElementById('e-id').value = fbKey;
+  document.getElementById('e-name').value = it.name;
+  document.getElementById('e-sku').value = it.sku || '';
+  document.getElementById('e-cat').value = it.category;
+  document.getElementById('e-zone').value = it.zone;
+  document.getElementById('e-unit').value = it.unit;
+  document.getElementById('e-qty').value = it.qty;
+  document.getElementById('e-min').value = it.minQty;
+  document.getElementById('e-exp').value = it.expiry || '';
+  document.getElementById('e-sup').value = it.supplier || '';
+  document.getElementById('e-note').value = it.note || '';
+  document.getElementById('edit-modal').classList.add('open');
+};
+
+window.saveEdit = function() {
+  const fbKey = document.getElementById('e-id').value;
+  const it = items.find(i => i.fbKey === fbKey);
+  const updated = {
+    name: document.getElementById('e-name').value.trim() || it.name,
+    sku: document.getElementById('e-sku').value.trim(),
+    category: document.getElementById('e-cat').value,
+    zone: document.getElementById('e-zone').value,
+    unit: document.getElementById('e-unit').value,
+    qty: parseFloat(document.getElementById('e-qty').value) || 0,
+    minQty: parseFloat(document.getElementById('e-min').value) || 0,
+    expiry: document.getElementById('e-exp').value || '',
+    supplier: document.getElementById('e-sup').value.trim(),
+    note: document.getElementById('e-note').value.trim(),
+    addedAt: it.addedAt
+  };
+  update(ref(db, 'storage/items/' + fbKey), updated)
+    .then(() => { closeModals(); showToast(`✓ "${updated.name}" оновлено`, 'ok'); })
+    .catch(e => showToast('Помилка: ' + e.message, 'err'));
+};
+
+window.suggestAdj = function() {
+  const q = document.getElementById('adj-q').value.toLowerCase().trim();
+  const box = document.getElementById('adj-suggestions');
+  if (!q) { box.innerHTML = ''; adjTarget = null; return; }
+  const matches = items.filter(i => i.name.toLowerCase().includes(q) || (i.sku||'').toLowerCase().includes(q)).slice(0,5);
+  if (!matches.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<div style="position:absolute;top:0;left:0;right:0;background:var(--warm-white);border:1px solid var(--border);border-radius:6px;z-index:50;box-shadow:var(--shadow);">${
+    matches.map(it => `<div onclick="selectAdj('${it.fbKey}')" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background 0.1s;" onmouseover="this.style.background='var(--parchment)'" onmouseout="this.style.background=''">${it.name} <span style="color:#aaa;font-size:11px;">(${it.qty} ${it.unit}) · ${it.zone}</span></div>`).join('')
+  }</div>`;
+};
+window.selectAdj = function(fbKey) {
+  adjTarget = fbKey; const it = items.find(i => i.fbKey === fbKey);
+  document.getElementById('adj-q').value = it.name; document.getElementById('adj-suggestions').innerHTML = '';
+};
+window.doAdjust = function() {
+  if (!adjTarget) { showToast('Оберіть продукт зі списку!', 'err'); return; }
+  const val = parseFloat(document.getElementById('adj-val').value);
+  if (isNaN(val) || val < 0) { showToast('Введіть коректну кількість!', 'err'); return; }
+  const op = document.getElementById('adj-op').value;
+  const it = items.find(i => i.fbKey === adjTarget);
+  const old = it.qty;
+  let newQty = op === 'add' ? Math.round((it.qty+val)*100)/100 : op === 'sub' ? Math.max(0, Math.round((it.qty-val)*100)/100) : val;
+  update(ref(db, 'storage/items/' + adjTarget), { qty: newQty })
+    .then(() => { const lbl = op==='add'?'приход':op==='sub'?'витрата':'встановлено'; showToast(`✓ ${it.name}: ${old} → ${newQty} ${it.unit} (${lbl})`, 'ok'); document.getElementById('adj-q').value=''; document.getElementById('adj-val').value=''; adjTarget=null; })
+    .catch(e => showToast('Помилка: ' + e.message, 'err'));
+};
+
+// ===== FILTERS =====
+window.setZone = function(el) { document.querySelectorAll('.ztab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); curZone=el.dataset.z; renderTable(); };
+window.toggleFilter = function(el,f) { if(activeFilters.has(f)){activeFilters.delete(f);el.classList.remove('active');}else{activeFilters.add(f);el.classList.add('active');} renderTable(); };
+window.sortBy = function(f) { if(sortF===f)sortD*=-1;else{sortF=f;sortD=1;} renderTable(); };
+window.filterByZone = function(zname) { curZone=zname; document.querySelectorAll('.ztab').forEach(t=>t.classList.toggle('active',t.dataset.z===zname)); renderTable(); };
+
+// ===== RENDER TABLE =====
+function renderTable() {
+  const q = document.getElementById('search-inp').value.toLowerCase();
+  let list = items.filter(it => {
+    if (curZone !== 'all' && it.zone !== curZone) return false;
+    if (q && !it.name.toLowerCase().includes(q) && !(it.category||'').toLowerCase().includes(q) && !(it.sku||'').toLowerCase().includes(q)) return false;
+    if (activeFilters.has('empty') && it.qty > 0) return false;
+    if (activeFilters.has('low') && (it.qty===0||it.minQty===0||it.qty>=it.minQty)) return false;
+    if (activeFilters.has('expire')) { const es=expiryStatus(it.expiry); if(es!=='soon'&&es!=='expired') return false; }
+    return true;
+  });
+  list.sort((a,b) => {
+    let av=a[sortF],bv=b[sortF];
+    if(sortF==='expiry'){av=av?new Date(av).getTime():Infinity;bv=bv?new Date(bv).getTime():Infinity;}
+    else if(typeof av==='string'){av=av.toLowerCase();bv=bv.toLowerCase();}
+    return av>bv?sortD:av<bv?-sortD:0;
+  });
+
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('empty-st');
+  if (!list.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = list.map(it => {
+    const z = ZONES[it.zone] || { icon:'📦', cls:'z-dry' };
+    const pct = it.minQty>0 ? Math.min(100,(it.qty/it.minQty)*100) : 100;
+    let qtyClass='qty-num', sbClass='sb-ok', sbText='В НАЯВНОСТІ', dotCls='dot-ok';
+    const es = expiryStatus(it.expiry);
+    if (it.qty===0) { qtyClass='qty-num empty'; sbClass='sb-empty'; sbText='ВІДСУТНІЙ'; dotCls='dot-empty'; }
+    else if (it.minQty>0&&it.qty<it.minQty) { qtyClass='qty-num low'; sbClass='sb-low'; sbText='МАЛИЙ ЗАПАС'; dotCls='dot-low'; }
+    if (es==='expired'&&it.qty>0) { sbClass='sb-expire'; sbText='ПРОСТРОЧЕНО'; dotCls='dot-expire'; }
+    else if (es==='soon'&&it.qty>0&&sbClass==='sb-ok') { sbClass='sb-expire'; sbText='ТЕРМІН СПЛИВАЄ'; dotCls='dot-expire'; }
+    const barColor = it.qty===0?'#e74c3c':pct<50?'#b8943a':'#5a7a5c';
+
+    let expiryHtml = '<span class="exp-none">—</span>';
+    if (it.expiry) {
+      const d=daysLeft(it.expiry), dateStr=new Date(it.expiry).toLocaleDateString('uk-UA');
+      if (d<0) expiryHtml=`<span class="exp-expired">⚠ ${dateStr}<span class="exp-days">Прострочено ${Math.abs(d)} дн. тому</span></span>`;
+      else if (d<=3) expiryHtml=`<span class="exp-soon">⏰ ${dateStr}<span class="exp-days">Залишилось: ${d} дн.</span></span>`;
+      else expiryHtml=`<span class="exp-ok">${dateStr}<span class="exp-days" style="color:#aaa;font-weight:400">Ще ${d} дн.</span></span>`;
+    }
+
+    // Order flags
+    const fData = orderFlags[it.fbKey] || { flag: null, orderQty: '' };
+    const isSoon = fData.flag === 'soon';
+    const isUrgent = fData.flag === 'urgent';
+    const hasQty = fData.orderQty && fData.orderQty !== '';
+    const key = it.fbKey;
+
+    // Row highlight
+    let rowStyle = '';
+    if (isUrgent) rowStyle = 'background:rgba(192,57,43,0.04);';
+    else if (isSoon) rowStyle = 'background:rgba(184,148,58,0.04);';
+
+    return `<tr style="${rowStyle}">
+      <td>
+        <span class="prod-name">${it.name}</span>
+        <span class="prod-cat">${it.category||''}${it.sku?' · '+it.sku:''}${it.note?' · '+it.note:''}</span>
+      </td>
+      <td><span class="zbadge ${z.cls}">${z.icon} ${it.zone}</span></td>
+      <td class="qty-wrap">
+        <div class="${qtyClass}">${it.qty} <span style="font-size:11px;font-weight:400;color:#aaa;">${it.unit}</span></div>
+        ${it.minQty>0?`<div class="qty-bar"><div class="qty-bar-fill" style="width:${pct}%;background:${barColor};"></div></div><div style="font-size:10px;color:#aaa;margin-top:2px;">мін: ${it.minQty} ${it.unit}</div>`:''}
+      </td>
+      <td class="expiry-cell">${expiryHtml}</td>
+      <td><span class="sbadge ${sbClass}"><span class="dot ${dotCls}"></span>${sbText}</span></td>
+      <td class="order-col">
+        <div class="flags-wrap" style="justify-content:center;">
+          <button class="flag-btn ${isSoon?'soon-active':''}" onclick="toggleFlag('${key}','soon')" title="Замовити найближчим часом">⚠️</button>
+          <button class="flag-btn ${isUrgent?'urgent-active':''}" onclick="toggleFlag('${key}','urgent')" title="Замовити ТЕРМІНОВО">🚨</button>
+        </div>
+      </td>
+      <td class="order-col">
+        <input
+          class="order-qty-inp ${hasQty?'has-val':''}"
+          type="number" min="0" step="0.1"
+          value="${fData.orderQty||''}"
+          placeholder="—"
+          oninput="setOrderQty('${key}', this.value)"
+          title="Кількість для замовлення"
+        />
+        ${fData.orderQty ? `<div style="font-size:10px;color:#888;margin-top:2px;">${it.unit}</div>` : ''}
+      </td>
+      <td class="row-actions">
+        <button class="btn btn-outline-gold btn-sm" onclick="openEdit('${key}')">Ред.</button>
+        <button class="btn btn-outline-red btn-sm" onclick="deleteItem('${key}')">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  updateTgBar();
+}
+
+// ===== ZONE OVERVIEW =====
+function renderZoneOverview() {
+  const box = document.getElementById('zone-overview');
+  box.innerHTML = Object.entries(ZONES).map(([zname, zmeta]) => {
+    const zItems = items.filter(i => i.zone===zname);
+    const low = zItems.filter(i=>i.minQty>0&&i.qty<i.minQty&&i.qty>0).length;
+    const empty = zItems.filter(i=>i.qty===0).length;
+    const expiring = zItems.filter(i=>{const es=expiryStatus(i.expiry);return es==='soon'||es==='expired';}).length;
+    const toOrder = zItems.filter(i=>orderFlags[i.fbKey]&&orderFlags[i.fbKey].flag).length;
+    return `<div onclick="filterByZone('${zname}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;margin-bottom:4px;" onmouseover="this.style.background='var(--parchment)'" onmouseout="this.style.background=''">
+      <span style="font-size:22px;">${zmeta.icon}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;color:var(--brown);">${zname}</div>
+        <div style="font-size:10px;color:#aaa;">${zmeta.temp}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);">${zItems.length}</div>
+        <div style="font-size:10px;color:#aaa;">позицій</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;margin-left:4px;">
+        ${toOrder?`<span style="background:#fde8e8;color:#c0391a;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">📋 ${toOrder}</span>`:''}
+        ${low?`<span style="background:#fef5e0;color:var(--gold);padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">⚠ ${low}</span>`:''}
+        ${empty?`<span style="background:#fde8e8;color:var(--red);padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">✕ ${empty}</span>`:''}
+        ${expiring?`<span style="background:#fde8cc;color:#c0601a;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">⏰ ${expiring}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== STATS =====
+function updateStats() {
+  document.getElementById('s-total').textContent = items.length;
+  document.getElementById('s-zones').textContent = new Set(items.map(i=>i.zone)).size;
+  document.getElementById('s-low').textContent = items.filter(i=>i.minQty>0&&i.qty>0&&i.qty<i.minQty).length;
+  document.getElementById('s-expire').textContent = items.filter(i=>{const es=expiryStatus(i.expiry);return es==='soon'||es==='expired';}).length;
+  document.getElementById('s-empty').textContent = items.filter(i=>i.qty===0).length;
+}
+
+function renderAll() { renderTable(); renderZoneOverview(); updateStats(); }
+
+// ===== TELEGRAM =====
+window.openTgSettings = function() {
+  document.getElementById('tg-token').value = tgToken;
+  document.getElementById('tg-chatid').value = tgChatId;
+  document.getElementById('tg-test-result').style.display = 'none';
+  document.getElementById('tg-settings-modal').classList.add('open');
+};
+
+window.saveTgSettings = function() {
+  tgToken = document.getElementById('tg-token').value.trim();
+  tgChatId = document.getElementById('tg-chatid').value.trim();
+  localStorage.setItem('tg_token', tgToken);
+  localStorage.setItem('tg_chatid', tgChatId);
+  closeModals();
+  showToast('✓ Налаштування Telegram збережено', 'ok');
+};
+
+window.testTelegram = async function() {
+  const token = document.getElementById('tg-token').value.trim();
+  const chatId = document.getElementById('tg-chatid').value.trim();
+  const resBox = document.getElementById('tg-test-result');
+  if (!token || !chatId) { resBox.style.display='block'; resBox.style.background='#fde8e8'; resBox.style.color='var(--red)'; resBox.textContent='Заповніть Token і Chat ID'; return; }
+  resBox.style.display='block'; resBox.style.background='#fef5e0'; resBox.style.color='var(--gold)'; resBox.textContent='Надсилаємо тестове повідомлення...';
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: chatId, text: '🐑 Зони зберігання — тестове з\'єднання успішне! ✅', parse_mode:'HTML' })
+    });
+    const data = await r.json();
+    if (data.ok) { resBox.style.background='#e8f5e8'; resBox.style.color='var(--sage)'; resBox.textContent='✅ Повідомлення надіслано успішно!'; }
+    else { resBox.style.background='#fde8e8'; resBox.style.color='var(--red)'; resBox.textContent='❌ Помилка: ' + (data.description||'невідома'); }
+  } catch(e) { resBox.style.background='#fde8e8'; resBox.style.color='var(--red)'; resBox.textContent='❌ Мережева помилка: ' + e.message; }
+};
+
+function buildOrderMessage() {
+  const flagged = getFlaggedItems();
+  const urgent = flagged.filter(i=>i.flag==='urgent');
+  const soon = flagged.filter(i=>i.flag==='soon');
+  const now = new Date().toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  let msg = `🐑 <b>ЗАМОВЛЕННЯ ПРОДУКТІВ</b>\n📅 ${now}\n`;
+  msg += `${'─'.repeat(28)}\n`;
+
+  if (urgent.length) {
+    msg += `\n🚨 <b>ТЕРМІНОВО ЗАМОВИТИ:</b>\n`;
+    const byZone = {};
+    urgent.forEach(it => { if(!byZone[it.zone]) byZone[it.zone]=[]; byZone[it.zone].push(it); });
+    Object.entries(byZone).forEach(([zone, zItems]) => {
+      msg += `\n  ${ZONES[zone]?.icon||'📦'} <i>${zone}</i>\n`;
+      zItems.forEach(it => {
+        const qtyStr = it.orderQty ? ` → замовити: <b>${it.orderQty} ${it.unit}</b>` : '';
+        const stockStr = ` (є: ${it.qty} ${it.unit})`;
+        msg += `  • ${it.name}${stockStr}${qtyStr}\n`;
+      });
+    });
+  }
+
+  if (soon.length) {
+    msg += `\n⚠️ <b>НАЙБЛИЖЧИМ ЧАСОМ:</b>\n`;
+    const byZone = {};
+    soon.forEach(it => { if(!byZone[it.zone]) byZone[it.zone]=[]; byZone[it.zone].push(it); });
+    Object.entries(byZone).forEach(([zone, zItems]) => {
+      msg += `\n  ${ZONES[zone]?.icon||'📦'} <i>${zone}</i>\n`;
+      zItems.forEach(it => {
+        const qtyStr = it.orderQty ? ` → замовити: <b>${it.orderQty} ${it.unit}</b>` : '';
+        const stockStr = ` (є: ${it.qty} ${it.unit})`;
+        msg += `  • ${it.name}${stockStr}${qtyStr}\n`;
+      });
+    });
+  }
+
+  msg += `\n${'─'.repeat(28)}\n`;
+  msg += `📦 Всього позицій: ${flagged.length} (🚨 ${urgent.length} термін., ⚠️ ${soon.length} найближч.)`;
+  return msg;
+}
+
+window.openTgSend = function() {
+  if (!tgToken || !tgChatId) {
+    showToast('Спочатку налаштуйте Telegram-бот!', 'err');
+    openTgSettings();
+    return;
+  }
+  const flagged = getFlaggedItems();
+  const urgent = flagged.filter(i=>i.flag==='urgent');
+  const soon = flagged.filter(i=>i.flag==='soon');
+  document.getElementById('tg-modal-urgent').textContent = `🚨 ${urgent.length} терміново`;
+  document.getElementById('tg-modal-soon').textContent = `⚠️ ${soon.length} найближчим часом`;
+  // Strip HTML tags for preview
+  const previewText = buildOrderMessage().replace(/<[^>]+>/g,'');
+  document.getElementById('tg-preview').textContent = previewText;
+  document.getElementById('tg-send-result').style.display = 'none';
+  document.getElementById('tg-send-modal').classList.add('open');
+};
+
+window.sendToTelegram = async function() {
+  const btn = document.getElementById('btn-do-send');
+  const resBox = document.getElementById('tg-send-result');
+  btn.disabled = true; btn.textContent = 'Надсилаємо...';
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: tgChatId, text: buildOrderMessage(), parse_mode:'HTML' })
+    });
+    const data = await r.json();
+    resBox.style.display='block';
+    if (data.ok) {
+      resBox.style.background='#e8f5e8'; resBox.style.color='var(--sage)';
+      resBox.innerHTML='✅ Замовлення успішно надіслано в Telegram!';
+      btn.textContent='✓ Надіслано';
+      setTimeout(closeModals, 2000);
+    } else {
+      resBox.style.background='#fde8e8'; resBox.style.color='var(--red)';
+      resBox.textContent='❌ Помилка Telegram: ' + (data.description||'невідома');
+      btn.disabled=false; btn.textContent='Надіслати';
+    }
+  } catch(e) {
+    resBox.style.display='block'; resBox.style.background='#fde8e8'; resBox.style.color='var(--red)';
+    resBox.textContent='❌ Мережева помилка: ' + e.message;
+    btn.disabled=false; btn.textContent='Надіслати';
+  }
+};
+
+// ===== MODAL =====
+window.closeModals = function() { document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open')); };
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModals();}));
+
+// ===== TOAST =====
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// Initial loading state
+document.getElementById('tbody').innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#aaa;font-size:13px;">🔄 Завантаження даних з Firebase...</td></tr>`;
+
+</script>
+</body>
+</html>
