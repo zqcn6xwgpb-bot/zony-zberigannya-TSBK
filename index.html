@@ -919,7 +919,91 @@
     border: 1px solid #ddd;
   }
 </style>
-</head>
+<style>
+  /* ===== PRINT BUTTON ===== */
+  .btn-print {
+    display: inline-flex; align-items: center;
+    padding: 7px 16px;
+    background: var(--parchment);
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    color: var(--brown);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-print:hover { background: #ede4cc; border-color: var(--amber); color: var(--amber); }
+
+  /* ===== PRINT AREA (hidden on screen) ===== */
+  #print-area { display: none; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area {
+      display: block !important;
+      position: absolute; top: 0; left: 0;
+      width: 100%;
+      padding: 20px;
+      font-family: 'DM Sans', Arial, sans-serif;
+    }
+    body { background: #fff !important; padding: 0 !important; }
+
+    .print-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #333;
+    }
+    .print-logo { display: flex; align-items: center; gap: 10px; }
+    .print-title { font-size: 22px; font-weight: 900; color: #1a1510; }
+    .print-subtitle { font-size: 11px; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+    .print-meta { font-size: 11px; color: #666; text-align: right; line-height: 1.8; }
+
+    .print-zone-block { page-break-inside: avoid; margin-bottom: 16px; }
+    .print-zone-title {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px; color: #444;
+      margin: 20px 0 6px;
+      padding: 5px 8px;
+      background: #f5f0e8;
+      border-left: 3px solid #3d2b1a;
+    }
+
+    .print-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 12px; margin-bottom: 4px;
+    }
+    .print-table th {
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: 700; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 1.5px; color: #555;
+      border: 1px solid #bbb;
+      background: #faf7f0;
+    }
+    .print-table td {
+      padding: 9px 10px;
+      border: 1px solid #ddd;
+      vertical-align: middle;
+    }
+    .print-table tr:nth-child(even) td { background: #fdfaf4; }
+    .print-table td.col-name { font-weight: 500; width: 45%; }
+    .print-table td.col-qty { font-weight: 700; font-size: 13px; text-align: center; width: 20%; white-space: nowrap; }
+    .print-table td.col-qty.low { color: #b8943a; }
+    .print-table td.col-qty.empty { color: #c0392b; }
+    .print-table th.col-note, .print-table td.col-note { width: 35%; background: #fff !important; }
+
+    .print-footer {
+      margin-top: 24px; padding-top: 8px;
+      border-top: 1px solid #ccc;
+      font-size: 10px; color: #aaa;
+      display: flex; justify-content: space-between;
+    }
+  }
+</style>
 <body>
 
 <header>
@@ -1031,7 +1115,15 @@
 
     <!-- RIGHT: TABLE -->
     <div class="card">
-      <div class="card-header"><span class="icon">📋</span><h2>Список продуктів</h2></div>
+      <div class="card-header" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="icon">📋</span><h2>Список продуктів</h2>
+        </div>
+        <button class="btn-print" onclick="printTable()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px;"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+          Друкувати
+        </button>
+      </div>
       <div class="card-body" style="padding-bottom:0;">
 
         <div class="search-bar">
@@ -1041,8 +1133,8 @@
 
         <div class="zone-tabs" id="zone-tabs">
           <button class="ztab active" data-z="all" onclick="setZone(this)">Всі зони</button>
-          <button class="ztab" data-z="Холодильник заготівельний" onclick="setZone(this)">❄️ Холодильник заготівельний</button>
-          <button class="ztab" data-z="Морозилка заготівельний + ларь" onclick="setZone(this)">🧊 Морозилка заготівельний + ларь</button>
+          <button class="ztab" data-z="Холодильник заготівельний + морозилка" onclick="setZone(this)">❄️ Холодильник заготівельний + морозилка</button>
+          <button class="ztab" data-z="Холодильник зелень" onclick="setZone(this)">🌿 Холодильник зелень</button>
           <button class="ztab" data-z="Сухий склад" onclick="setZone(this)">📦 Сухий склад</button>
         </div>
 
@@ -1096,6 +1188,9 @@
   </div>
 </div>
 
+<!-- PRINT AREA -->
+<div id="print-area"></div>
+
 <!-- ADD MODAL -->
 <div class="overlay" id="add-modal">
   <div class="modal">
@@ -1121,7 +1216,7 @@
       <div class="form-row">
         <div class="fg"><label>Зона зберігання *</label>
           <select id="a-zone">
-            <option>Холодильник заготівельний</option><option>Морозилка заготівельний + ларь</option>
+            <option>Холодильник заготівельний + морозилка</option><option>Холодильник зелень</option>
             <option>Сухий склад</option>
           </select>
         </div>
@@ -1175,7 +1270,7 @@
       <div class="form-row">
         <div class="fg"><label>Зона</label>
           <select id="e-zone">
-            <option>Холодильник заготівельний</option><option>Морозилка заготівельний + ларь</option>
+            <option>Холодильник заготівельний + морозилка</option><option>Холодильник зелень</option>
             <option>Сухий склад</option>
           </select>
         </div>
@@ -1310,8 +1405,8 @@ onValue(settingsRef, (snap) => {
 }, { onlyOnce: true });
 
 const ZONES = {
-  'Холодильник заготівельний': { icon: '❄️', cls: 'z-cold', temp: '+2°C до +6°C' },
-  'Морозилка заготівельний + ларь': { icon: '🧊', cls: 'z-freeze', temp: '-18°C' },
+  'Холодильник заготівельний + морозилка': { icon: '❄️', cls: 'z-cold', temp: '+2°C до +6°C' },
+  'Холодильник зелень': { icon: '🌿', cls: 'z-freeze', temp: '-18°C' },
   'Сухий склад': { icon: '📦', cls: 'z-dry', temp: '+15°C до +20°C' },
 };
 
@@ -1644,22 +1739,29 @@ function renderZoneOverview() {
     const empty = zItems.filter(i=>i.qty===0).length;
     const expiring = zItems.filter(i=>{const es=expiryStatus(i.expiry);return es==='soon'||es==='expired';}).length;
     const toOrder = zItems.filter(i=>orderFlags[i.fbKey]&&orderFlags[i.fbKey].flag).length;
-    return `<div onclick="filterByZone('${zname}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;margin-bottom:4px;" onmouseover="this.style.background='var(--parchment)'" onmouseout="this.style.background=''">
-      <span style="font-size:22px;">${zmeta.icon}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;font-size:13px;color:var(--brown);">${zname}</div>
-        <div style="font-size:10px;color:#aaa;">${zmeta.temp}</div>
+    const zkey = encodeURIComponent(zname);
+    return `<div style="margin-bottom:6px;">
+      <div onclick="filterByZone('${zname}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px 8px 0 0;cursor:pointer;transition:background 0.15s;background:var(--warm-white);border:1px solid var(--border);border-bottom:none;" onmouseover="this.style.background='var(--parchment)'" onmouseout="this.style.background='var(--warm-white)'">
+        <span style="font-size:22px;">${zmeta.icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:13px;color:var(--brown);">${zname}</div>
+          <div style="font-size:10px;color:#aaa;">${zmeta.temp}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);">${zItems.length}</div>
+          <div style="font-size:10px;color:#aaa;">позицій</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;margin-left:4px;">
+          ${toOrder?`<span style="background:#fde8e8;color:#c0391a;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">📋 ${toOrder}</span>`:''}
+          ${low?`<span style="background:#fef5e0;color:var(--gold);padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">⚠ ${low}</span>`:''}
+          ${empty?`<span style="background:#fde8e8;color:var(--red);padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">✕ ${empty}</span>`:''}
+          ${expiring?`<span style="background:#fde8cc;color:#c0601a;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">⏰ ${expiring}</span>`:''}
+        </div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);">${zItems.length}</div>
-        <div style="font-size:10px;color:#aaa;">позицій</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:2px;margin-left:4px;">
-        ${toOrder?`<span style="background:#fde8e8;color:#c0391a;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">📋 ${toOrder}</span>`:''}
-        ${low?`<span style="background:#fef5e0;color:var(--gold);padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">⚠ ${low}</span>`:''}
-        ${empty?`<span style="background:#fde8e8;color:var(--red);padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">✕ ${empty}</span>`:''}
-        ${expiring?`<span style="background:#fde8cc;color:#c0601a;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">⏰ ${expiring}</span>`:''}
-      </div>
+      <button onclick="event.stopPropagation();printZone('${zname}')" style="width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:7px 12px;background:var(--parchment);border:1px solid var(--border);border-top:1px dashed var(--border);border-radius:0 0 8px 8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:var(--brown);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='#ede4cc';this.style.color='var(--amber)'" onmouseout="this.style.background='var(--parchment)';this.style.color='var(--brown)'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0;"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+        Друкувати таблицю зони
+      </button>
     </div>`;
   }).join('');
 }
@@ -1796,7 +1898,130 @@ window.sendToTelegram = async function() {
   }
 };
 
-// ===== MODAL =====
+// ===== PRINT =====
+window.printTable = function() {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('uk-UA', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+
+  // Групуємо поточний відфільтрований список по зонах
+  const q = document.getElementById('search-inp').value.toLowerCase();
+  let list = items.filter(it => {
+    if (curZone !== 'all' && it.zone !== curZone) return false;
+    if (q && !it.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  list.sort((a, b) => a.name.localeCompare(b.name, 'uk'));
+
+  const byZone = {};
+  list.forEach(it => {
+    if (!byZone[it.zone]) byZone[it.zone] = [];
+    byZone[it.zone].push(it);
+  });
+
+  let html = `
+    <div class="print-header">
+      <div class="print-logo">
+        <span style="font-size:32px;">🐑</span>
+        <div>
+          <div class="print-title">Зони зберігання</div>
+          <div class="print-subtitle">Контроль продуктів · Ресторан</div>
+        </div>
+      </div>
+      <div class="print-meta">
+        📅 ${dateStr}<br>
+        🕐 ${timeStr}<br>
+        📦 Позицій: ${list.length}
+      </div>
+    </div>`;
+
+  Object.entries(ZONES).forEach(([zoneName, zmeta]) => {
+    const zItems = byZone[zoneName];
+    if (!zItems || !zItems.length) return;
+
+    html += `<div class="print-zone-block">
+      <div class="print-zone-title">${zmeta.icon} ${zoneName}</div>
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th class="col-name">Назва продукту</th>
+            <th class="col-qty" style="text-align:center;">Залишок</th>
+            <th class="col-note">Нотатка / замовлення</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${zItems.map(it => {
+            let qtyClass = 'col-qty';
+            if (it.qty === 0) qtyClass += ' empty';
+            else if (it.minQty > 0 && it.qty < it.minQty) qtyClass += ' low';
+            return `<tr>
+              <td class="col-name">${it.name}${it.note ? `<div style="font-size:10px;color:#999;margin-top:2px;">${it.note}</div>` : ''}</td>
+              <td class="${qtyClass}">${it.qty} ${it.unit}${it.minQty > 0 ? `<div style="font-size:10px;font-weight:400;color:#aaa;">мін: ${it.minQty}</div>` : ''}</td>
+              <td class="col-note"></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  });
+
+  html += `<div class="print-footer">
+    <span>🐑 Зони зберігання — Ресторан</span>
+    <span>Надруковано: ${dateStr}, ${timeStr}</span>
+  </div>`;
+
+  document.getElementById('print-area').innerHTML = html;
+  window.print();
+};
+
+// ===== PRINT ZONE =====
+window.printZone = function(zoneName) {
+  const zmeta = ZONES[zoneName] || { icon: '📦' };
+  const zItems = items.filter(i => i.zone === zoneName).sort((a,b) => a.name.localeCompare(b.name, 'uk'));
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('uk-UA', { day:'2-digit', month:'long', year:'numeric' });
+  const timeStr = now.toLocaleTimeString('uk-UA', { hour:'2-digit', minute:'2-digit' });
+
+  const rows = zItems.map(it => {
+    let qtyClass = 'col-qty';
+    if (it.qty === 0) qtyClass += ' empty';
+    else if (it.minQty > 0 && it.qty < it.minQty) qtyClass += ' low';
+    return `<tr>
+      <td class="col-name">${it.name}${it.note?`<div style="font-size:10px;color:#999;margin-top:1px;">${it.note}</div>`:''}</td>
+      <td class="${qtyClass}">${it.qty} ${it.unit}${it.minQty>0?`<div style="font-size:10px;font-weight:400;color:#aaa;">мін: ${it.minQty}</div>`:''}</td>
+      <td class="col-note"></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('print-area').innerHTML = `
+    <div class="print-header">
+      <div class="print-logo">
+        <span style="font-size:32px;">${zmeta.icon}</span>
+        <div>
+          <div class="print-title">${zoneName}</div>
+          <div class="print-subtitle">Зони зберігання · Ресторан</div>
+        </div>
+      </div>
+      <div class="print-meta">
+        📅 ${dateStr}<br>🕐 ${timeStr}<br>📦 Позицій: ${zItems.length}
+      </div>
+    </div>
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th class="col-name">Назва продукту</th>
+          <th class="col-qty" style="text-align:center;">Залишок</th>
+          <th class="col-note">Помітка / замовлення</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="print-footer">
+      <span>🐑 Зони зберігання — Ресторан</span>
+      <span>Надруковано: ${dateStr}, ${timeStr}</span>
+    </div>`;
+  window.print();
+};
 window.closeModals = function() { document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open')); };
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModals();}));
 
