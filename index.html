@@ -596,10 +596,182 @@
     .stats-row { grid-template-columns: repeat(3, 1fr); }
   }
 
-  @media (max-width: 600px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    header { padding: 0 16px; }
-    .page { padding: 16px 12px; }
+  /* ===== MOBILE SIDEBAR TOGGLE ===== */
+  .sidebar-toggle {
+    display: none;
+    align-items: center; gap: 8px;
+    padding: 10px 14px;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    color: var(--brown);
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 12px;
+    transition: background 0.15s;
+  }
+  .sidebar-toggle:hover { background: #ede4cc; }
+  .sidebar-toggle .arrow { margin-left: auto; transition: transform 0.25s; }
+  .sidebar-toggle.open .arrow { transform: rotate(180deg); }
+  .sidebar-collapsible { transition: max-height 0.35s ease, opacity 0.25s; overflow: hidden; }
+
+  /* ===== TABLET ===== */
+  @media (max-width: 768px) {
+    /* Stats */
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-val { font-size: 28px; }
+
+    /* Layout */
+    .layout { grid-template-columns: 1fr; gap: 12px; }
+    .sidebar-toggle { display: flex; }
+
+    /* Page */
+    .page { padding: 14px 12px; }
+    .page-title { font-size: 26px; }
+    .page-subtitle { font-size: 11px; letter-spacing: 1px; }
+    .page-header { flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .page-header .btn { width: 100%; text-align: center; }
+
+    /* Zone tabs scroll */
+    .zone-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; gap: 5px; scrollbar-width: none; }
+    .zone-tabs::-webkit-scrollbar { display: none; }
+    .ztab { flex-shrink: 0; font-size: 11px; padding: 5px 10px; }
+
+    /* Filters */
+    .filter-row { gap: 5px; flex-wrap: wrap; }
+    .fpill { font-size: 11px; padding: 5px 10px; }
+
+    /* Modals */
+    .overlay { align-items: flex-end; padding: 0; }
+    .modal { 
+      width: 100% !important; 
+      max-width: 100% !important;
+      max-height: 90vh; 
+      margin: 0;
+      border-radius: 20px 20px 0 0;
+      overflow-y: auto;
+    }
+    .modal-body { padding: 16px; }
+    .modal-head { padding: 16px 16px 12px; }
+    .modal-foot { padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+
+    /* Card body */
+    .card-body { padding: 12px 14px; }
+
+    /* Telegram bar fixed bottom */
+    .tg-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 200;
+      border-radius: 0;
+      padding: 10px 14px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -3px 16px rgba(0,0,0,0.12);
+      gap: 8px;
+    }
+    .tg-bar-label { display: none; }
+    .tg-count { flex: 1; min-width: 0; }
+    .btn-tg { padding: 9px 14px; font-size: 12px; }
+    .btn-tg-settings { padding: 8px 11px; font-size: 11px; }
+    body { padding-bottom: 72px; }
+  }
+
+  /* ===== MOBILE TABLE → CARDS ===== */
+  @media (max-width: 768px) {
+    .table-wrap table { display: block; }
+    .table-wrap table thead { display: none; }
+    .table-wrap table tbody { display: block; }
+
+    /* Each row = card */
+    .table-wrap table tbody tr {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto auto auto;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 4px 8px;
+      position: relative;
+      background: var(--warm-white);
+    }
+    .table-wrap table tbody tr:nth-child(even) { background: var(--cream); }
+
+    .table-wrap table tbody tr td {
+      display: block;
+      padding: 0;
+      border: none;
+    }
+
+    /* Row 1 left: product name */
+    .table-wrap table tbody tr td:nth-child(1) {
+      grid-column: 1; grid-row: 1;
+      padding-right: 80px;
+    }
+    .prod-name { font-size: 15px; font-weight: 600; }
+    .prod-cat { font-size: 11px; }
+
+    /* Row 1 right: action buttons */
+    .table-wrap table tbody tr td:nth-child(8) {
+      grid-column: 2; grid-row: 1;
+      display: flex; gap: 4px; align-items: flex-start;
+      position: absolute; top: 12px; right: 12px;
+    }
+
+    /* Row 2: zone + status */
+    .table-wrap table tbody tr td:nth-child(2) { grid-column: 1; grid-row: 2; }
+    .table-wrap table tbody tr td:nth-child(5) { grid-column: 2; grid-row: 2; justify-self: end; }
+
+    /* Row 3: qty + expiry */
+    .table-wrap table tbody tr td:nth-child(3) { grid-column: 1; grid-row: 3; }
+    .table-wrap table tbody tr td:nth-child(4) { grid-column: 2; grid-row: 3; justify-self: end; text-align: right; }
+    .qty-wrap { display: flex; align-items: center; gap: 8px; }
+    .qty-num { font-size: 18px; }
+
+    /* Row 4: order flags + qty input */
+    .table-wrap table tbody tr td:nth-child(6) { grid-column: 1; grid-row: 4; }
+    .table-wrap table tbody tr td:nth-child(7) { grid-column: 2; grid-row: 4; justify-self: end; }
+
+    /* Bigger touch targets for flags */
+    .flag-btn { width: 38px; height: 38px; font-size: 17px; }
+    .btn.btn-sm { padding: 7px 13px; font-size: 12px; min-height: 34px; }
+    .order-qty-inp { width: 74px; font-size: 14px; padding: 7px 8px; }
+
+    /* Zone badge smaller */
+    .zbadge { font-size: 11px; padding: 3px 8px; }
+
+    /* Status badge */
+    .sbadge { font-size: 9px; padding: 3px 7px; }
+
+    /* Expiry compact */
+    .exp-ok, .exp-soon, .exp-expired, .exp-none { font-size: 11px; }
+    .exp-days { display: block; font-size: 10px; }
+  }
+
+  /* ===== SMALL PHONES ===== */
+  @media (max-width: 400px) {
+    .page { padding: 10px 8px; }
+    .page-title { font-size: 22px; }
+    .stats-row { gap: 6px; }
+    .stat-val { font-size: 22px; }
+    .stat-icon { font-size: 16px; }
+    .stat-label { font-size: 9px; }
+    .stat-card { padding: 12px 10px; }
+  }
+
+  /* ===== HEADER MOBILE ===== */
+  @media (max-width: 768px) {
+    header { 
+      padding: 0 14px; 
+      height: 52px;
+    }
+    .logo { gap: 10px; }
+    .logo-emblem { font-size: 20px; }
+    .logo-text h1 { font-size: 15px; letter-spacing: 0.5px; }
+    .logo-text p { display: none; }
+    #clock { font-size: 13px; letter-spacing: 1px; }
+    #date-disp { display: none; }
+    .header-right { gap: 10px; }
+    #sync-badge { padding: 5px 8px; gap: 5px; }
+    #sync-label { display: none; }
   }
 
   /* ===== ORDER FLAGS ===== */
@@ -759,7 +931,7 @@
     </div>
   </div>
   <div class="header-right">
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,0.06);">
+    <div id="sync-badge" style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,0.06);">
       <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--gold-light);display:inline-block;flex-shrink:0;animation:blink-sync 1.5s infinite;transition:background 0.4s;"></span>
       <span id="sync-label" style="font-size:11px;font-weight:600;color:var(--gold-light);letter-spacing:1px;white-space:nowrap;">Підключення...</span>
     </div>
@@ -816,6 +988,11 @@
 
     <!-- LEFT: ZONES overview -->
     <div>
+      <button class="sidebar-toggle" id="sidebar-btn" onclick="toggleSidebar()">
+        🗺️ Зони та коригування
+        <span class="arrow">▼</span>
+      </button>
+      <div class="sidebar-collapsible" id="sidebar-content">
       <div class="card" style="margin-bottom:14px;">
         <div class="card-header"><span class="icon">🗺️</span><h2>Зони зберігання</h2></div>
         <div class="card-body" style="padding:14px;">
@@ -849,6 +1026,7 @@
           <button class="btn" onclick="doAdjust()">Застосувати зміну</button>
         </div>
       </div>
+      </div><!-- /sidebar-collapsible -->
     </div>
 
     <!-- RIGHT: TABLE -->
@@ -1088,7 +1266,7 @@
 <!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getDatabase, ref, remove, onValue, push, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import { getDatabase, ref, set, remove, onValue, push, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
 // ===== FIREBASE CONFIG =====
 const firebaseConfig = {
@@ -1105,6 +1283,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const itemsRef = ref(db, 'storage/items');
+const settingsRef = ref(db, 'storage/settings');
 
 // ===== STATE =====
 let items = [];
@@ -1114,13 +1293,21 @@ let activeFilters = new Set();
 let adjTarget = null;
 let isLoaded = false;
 
-// Order flags stored locally (no need to sync to Firebase — per-session workflow)
-// key: fbKey → { flag: 'soon'|'urgent'|null, orderQty: number }
+// Order flags stored locally (per-session workflow)
 let orderFlags = JSON.parse(localStorage.getItem('order_flags') || '{}');
 
-// Telegram settings
-let tgToken = localStorage.getItem('tg_token') || '';
-let tgChatId = localStorage.getItem('tg_chatid') || '';
+// Telegram settings — завантажуються з Firebase
+let tgToken = '';
+let tgChatId = '';
+
+// Завантажити налаштування Telegram з Firebase один раз при старті
+onValue(settingsRef, (snap) => {
+  const s = snap.val();
+  if (s) {
+    tgToken  = s.tgToken  || '';
+    tgChatId = s.tgChatId || '';
+  }
+}, { onlyOnce: true });
 
 const ZONES = {
   'Холодильник заготівельний': { icon: '❄️', cls: 'z-cold', temp: '+2°C до +6°C' },
@@ -1177,19 +1364,34 @@ onValue(itemsRef, (snapshot) => {
 
 // ===== SEED SAMPLE DATA =====
 function seedSampleData() {
-  const d = (offset) => { const dt = new Date(); dt.setDate(dt.getDate() + offset); return dt.toISOString().slice(0,10); };
+  const today = new Date().toLocaleDateString('uk-UA');
   const samples = [
-    { name: 'Куряче філе', sku: 'CHKN-FLT', category: "М'ясо та птиця", zone: 'Холодильник заготівельний', unit: 'кг', qty: 8.5, minQty: 5, expiry: d(2), supplier: 'Наша Ряба', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Яловичина (ребра)', sku: 'BEEF-RIB', category: "М'ясо та птиця", zone: 'Холодильник заготівельний', unit: 'кг', qty: 3.2, minQty: 4, expiry: d(1), supplier: 'Мясна крамниця', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Лосось філе', sku: 'SALM-FLT', category: 'Риба та морепродукти', zone: 'Холодильник заготівельний', unit: 'кг', qty: 0, minQty: 3, expiry: d(3), supplier: 'АкваМаркет', note: 'Замовити терміново', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Молоко 3.2%', sku: 'MILK-32', category: 'Молочні продукти', zone: 'Холодильник заготівельний', unit: 'л', qty: 12, minQty: 5, expiry: d(5), supplier: 'Яготинське', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Яйця С1', sku: 'EGG-C1', category: 'Яйця', zone: 'Холодильник заготівельний', unit: 'шт', qty: 120, minQty: 50, expiry: d(14), supplier: 'Птахофабрика', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Куряче філе (морожене)', sku: 'CHKN-FRZ', category: 'Заморожені продукти', zone: 'Морозилка заготівельний + ларь', unit: 'кг', qty: 25, minQty: 10, expiry: d(60), supplier: 'Наша Ряба', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Морозиво ванільне', sku: 'ICE-VNL', category: 'Заморожені продукти', zone: 'Морозилка заготівельний + ларь', unit: 'кг', qty: 6, minQty: 3, expiry: d(90), supplier: 'Рудь', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Борошно пшеничне в/с', sku: 'FLWR-WH', category: 'Крупи та борошно', zone: 'Сухий склад', unit: 'кг', qty: 50, minQty: 20, expiry: d(120), supplier: 'Metro', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Цукор білий', sku: 'SUGR-WH', category: 'Крупи та борошно', zone: 'Сухий склад', unit: 'кг', qty: 30, minQty: 10, expiry: d(365), supplier: 'Metro', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Оливкова олія', sku: 'OIL-OLV', category: 'Олії та жири', zone: 'Сухий склад', unit: 'л', qty: 8, minQty: 5, expiry: d(180), supplier: 'Metro', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
-    { name: 'Соус соєвий', sku: 'SOY-SCE', category: 'Консерви та соуси', zone: 'Сухий склад', unit: 'л', qty: 2, minQty: 3, expiry: d(200), supplier: 'АТБ', note: '', addedAt: new Date().toLocaleDateString('uk-UA') },
+    { name: 'Барбарис в\'ялений',          category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 2,    minQty: 1,   expiry: '2026-03-31', supplier: '', note: '', addedAt: today },
+    { name: 'Вегета',                       category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 0.5, expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Зіра',                         category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Кмин',                         category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Коріандр',                     category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 2,    minQty: 1,   expiry: '2026-03-31', supplier: '', note: '', addedAt: today },
+    { name: 'Кунжут',                       category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0.5,  minQty: 0.5, expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Оцет столовий',                category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 5,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Пажитник',                     category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0.7,  minQty: 0.5, expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Паприка капчені',              category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Перець болгарський сушений',   category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Перець духмяний горошок',      category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0.2,  minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Перець чорний мелений',        category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Пластівці Чілі',               category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Сванська сіль',                category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Соус ворчестер',               category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1.5,  minQty: 0.5, expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Соус соєвий',                  category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 2,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Спеція для риби',              category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0,    minQty: 0.2, expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Сумах',                        category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 2,    minQty: 0.5, expiry: '2026-03-31', supplier: '', note: '', addedAt: today },
+    { name: 'Суміш перців',                 category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0.5,  minQty: 0.5, expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Томат сушений',                category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Уцхо',                         category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0.5,  minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Хмелі',                        category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 2,    minQty: 1,   expiry: '2026-03-31', supplier: '', note: '', addedAt: today },
+    { name: 'Часник пластівці',             category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Часник сушений гранули',       category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0.5,  minQty: 0.5, expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Чебрець сушений',              category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 1,    minQty: 1,   expiry: '',           supplier: '', note: '', addedAt: today },
+    { name: 'Шафран',                       category: 'Спеції та приправи', zone: 'Сухий склад', unit: 'кг', qty: 0.15, minQty: 0.1, expiry: '',           supplier: '', note: '', addedAt: today },
   ];
   samples.forEach(item => push(itemsRef, item));
 }
@@ -1482,12 +1684,11 @@ window.openTgSettings = function() {
 };
 
 window.saveTgSettings = function() {
-  tgToken = document.getElementById('tg-token').value.trim();
+  tgToken  = document.getElementById('tg-token').value.trim();
   tgChatId = document.getElementById('tg-chatid').value.trim();
-  localStorage.setItem('tg_token', tgToken);
-  localStorage.setItem('tg_chatid', tgChatId);
-  closeModals();
-  showToast('✓ Налаштування Telegram збережено', 'ok');
+  set(settingsRef, { tgToken, tgChatId })
+    .then(() => { closeModals(); showToast('✓ Налаштування Telegram збережено та синхронізовано', 'ok'); })
+    .catch(e => showToast('Помилка збереження: ' + e.message, 'err'));
 };
 
 window.testTelegram = async function() {
@@ -1605,6 +1806,37 @@ function showToast(msg, type='') {
   t.textContent = msg; t.className = 'toast '+type+' show';
   setTimeout(()=>t.classList.remove('show'), 3500);
 }
+
+// ===== SIDEBAR MOBILE TOGGLE =====
+let sidebarOpen = false;
+function initSidebar() {
+  const content = document.getElementById('sidebar-content');
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    content.style.maxHeight = '0px';
+    content.style.opacity = '0';
+    sidebarOpen = false;
+  } else {
+    content.style.maxHeight = '';
+    content.style.opacity = '';
+  }
+}
+window.toggleSidebar = function() {
+  const content = document.getElementById('sidebar-content');
+  const btn = document.getElementById('sidebar-btn');
+  sidebarOpen = !sidebarOpen;
+  if (sidebarOpen) {
+    content.style.maxHeight = content.scrollHeight + 'px';
+    content.style.opacity = '1';
+    btn.classList.add('open');
+  } else {
+    content.style.maxHeight = '0px';
+    content.style.opacity = '0';
+    btn.classList.remove('open');
+  }
+};
+window.addEventListener('resize', initSidebar);
+initSidebar();
 
 // Initial loading state
 document.getElementById('tbody').innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#aaa;font-size:13px;">🔄 Завантаження даних з Firebase...</td></tr>`;
