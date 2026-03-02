@@ -2,1587 +2,837 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Зони зберігання — Контроль продуктів</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Зони зберігання</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream: #faf7f0;
-    --parchment: #f2ead8;
-    --warm-white: #fffef9;
-    --ink: #1a1510;
-    --brown: #3d2b1a;
-    --amber: #c8702a;
-    --amber-light: #e8944a;
-    --sage: #5a7a5c;
-    --sage-light: #7aaa7d;
-    --red: #c0392b;
-    --red-light: #e74c3c;
-    --gold: #b8943a;
-    --gold-light: #d4aa50;
-    --blue-cold: #2e6b9e;
-    --border: rgba(61,43,26,0.12);
-    --shadow: 0 4px 24px rgba(26,21,16,0.08);
+:root {
+  --cream:#faf7f0;--parchment:#f2ead8;--warm-white:#fffef9;
+  --ink:#1a1510;--brown:#3d2b1a;--amber:#c8702a;
+  --sage:#5a7a5c;--red:#c0392b;--gold:#b8943a;--blue:#2e6b9e;
+  --border:rgba(61,43,26,.12);--shadow:0 2px 16px rgba(26,21,16,.07);--r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:var(--brown);height:54px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo span{font-size:22px;}
+.logo h1{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--parchment);letter-spacing:.5px;}
+.hdr-r{display:flex;align-items:center;gap:12px;}
+#sdot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block;transition:background .4s;}
+#sdot.ok{background:#5a7a5c;}
+#sdot.err{background:#c0392b;}
+#sdot.con{animation:bsync 1.4s infinite;}
+@keyframes bsync{0%,100%{opacity:1}50%{opacity:.35}}
+#clock{font-size:13px;font-weight:600;color:var(--parchment);letter-spacing:1.5px;}
+
+/* PAGE */
+.page{max-width:1400px;margin:0 auto;padding:18px 14px 96px;}
+
+/* STATS */
+.stats{display:flex;gap:7px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.stats::-webkit-scrollbar{display:none;}
+.sc{background:var(--warm-white);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;box-shadow:var(--shadow);min-width:0;}
+.se{font-size:16px;}
+.sv{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1;}
+.sl{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#aaa;white-space:nowrap;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:272px 1fr;gap:12px;align-items:start;}
+
+/* CARD */
+.card{background:var(--warm-white);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+.chd{padding:11px 15px;border-bottom:1px solid var(--border);background:var(--parchment);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.chd h2{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--brown);}
+.cbd{padding:13px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 15px;background:var(--brown);color:var(--parchment);border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,transform .1s;white-space:nowrap;-webkit-appearance:none;}
+.btn:active{transform:scale(.96);}
+.btn:hover{background:var(--amber);}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
+.btn.ghost{background:transparent;border:1.5px solid var(--border);color:#888;}
+.btn.ghost:hover{background:var(--parchment);}
+.btn.del{background:transparent;border:1.5px solid #f0d5d5;color:var(--red);}
+.btn.del:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.btn.sage{background:transparent;border:1.5px solid #cce0cc;color:var(--sage);}
+.btn.sage:hover{background:var(--sage);color:#fff;}
+
+/* FORM */
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg{margin-bottom:11px;}
+.fg label{display:block;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#999;margin-bottom:4px;}
+.fg input,.fg select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
+.fg input:focus,.fg select:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,112,42,.1);background:var(--warm-white);}
+
+/* ZONE TABS */
+.ztabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:11px;padding-bottom:2px;}
+.ztabs::-webkit-scrollbar{display:none;}
+.ztab{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:#888;font-family:'DM Sans';font-size:12px;font-weight:600;cursor:pointer;transition:all .13s;white-space:nowrap;flex-shrink:0;}
+.ztab.on{background:var(--brown);border-color:var(--brown);color:var(--parchment);}
+.ztab:hover:not(.on){border-color:var(--amber);color:var(--amber);}
+
+/* SEARCH */
+.srch{position:relative;margin-bottom:10px;}
+.srch input{width:100%;padding:10px 14px 10px 36px;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);font-family:'DM Sans';font-size:13px;outline:none;color:var(--ink);}
+.srch input:focus{border-color:var(--amber);background:var(--warm-white);}
+.srch .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
+
+/* FILTER PILLS */
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px;}
+.pill{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:#777;font-size:11px;font-weight:600;cursor:pointer;transition:all .13s;}
+.pill:hover{border-color:var(--amber);color:var(--amber);}
+.pill.pg{background:var(--sage);border-color:var(--sage);color:#fff;}
+.pill.py{background:var(--gold);border-color:var(--gold);color:#fff;}
+.pill.pr{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* TABLE */
+.tbl{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead{background:var(--parchment);}
+th{padding:9px 11px;text-align:left;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;cursor:pointer;user-select:none;border-bottom:1px solid var(--border);white-space:nowrap;}
+th:hover{color:var(--amber);}
+tbody tr{border-bottom:1px solid var(--border);border-left:3px solid transparent;transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(200,112,42,.025);}
+tbody tr.mk-green{border-left-color:var(--sage);}
+tbody tr.mk-yellow{border-left-color:var(--gold);}
+tbody tr.mk-red{border-left-color:var(--red);background:rgba(192,57,43,.018);}
+td{padding:10px 11px;vertical-align:middle;}
+.pn{font-weight:600;font-size:13px;cursor:pointer;}
+.pn:hover{color:var(--amber);}
+.pm{font-size:11px;color:#bbb;margin-top:2px;}
+
+/* Zone chip */
+.zchip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;}
+
+/* QTY inline edit */
+.qcell{cursor:pointer;}
+.qdisp{display:flex;align-items:baseline;gap:3px;}
+.qn{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;line-height:1;}
+.qn.low{color:var(--gold);}
+.qn.zero{color:var(--red);}
+.qu{font-size:11px;color:#bbb;}
+.qhint{font-size:9px;color:#ddd;margin-top:1px;}
+.qbar{height:3px;background:#ede5d5;border-radius:2px;margin-top:3px;width:50px;overflow:hidden;}
+.qbf{height:100%;border-radius:2px;}
+.qedit{display:flex;align-items:center;gap:4px;}
+.qedit input{width:70px;padding:6px 8px;border:2px solid var(--amber);border-radius:6px;background:var(--warm-white);font-family:'DM Sans';font-size:15px;font-weight:700;text-align:center;outline:none;box-shadow:0 0 0 3px rgba(200,112,42,.1);}
+.qok{padding:5px 9px;background:var(--sage);color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;}
+.qx{padding:5px 8px;background:transparent;border:1px solid #ddd;border-radius:5px;font-size:11px;cursor:pointer;color:#999;}
+
+/* MARKERS */
+.mkrw{display:flex;gap:5px;justify-content:center;}
+.mkr{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .13s;opacity:.28;}
+.mkr.on{opacity:1;transform:scale(1.14);}
+.mkr:hover{opacity:.7;}
+.mkr.g{background:var(--sage);border-color:var(--sage);}
+.mkr.y{background:var(--gold);border-color:var(--gold);}
+.mkr.r{background:var(--red);border-color:var(--red);}
+.mkr.g.on{box-shadow:0 0 0 3px rgba(90,122,92,.26);}
+.mkr.y.on{box-shadow:0 0 0 3px rgba(184,148,58,.26);}
+.mkr.r.on{box-shadow:0 0 0 3px rgba(192,57,43,.26);animation:rp 1.6s infinite;}
+@keyframes rp{0%,100%{box-shadow:0 0 0 3px rgba(192,57,43,.26);}50%{box-shadow:0 0 0 7px rgba(192,57,43,.07);}}
+
+/* STEPPER */
+.step{display:flex;align-items:stretch;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;height:36px;}
+.step .sb{width:36px;border:none;background:var(--parchment);color:var(--brown);font-size:19px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;line-height:1;user-select:none;}
+.step .sb:hover{background:#e5d8c4;}
+.step .sb:active{background:var(--amber);color:#fff;}
+.step input{min-width:0;flex:1;width:52px;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);background:var(--warm-white);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;text-align:center;color:var(--ink);outline:none;padding:0;}
+.step input:focus{background:#fffbf5;}
+.step.hv{border-color:var(--sage);}
+.step.hv .sb{background:#eef6ee;}
+.step.hv input{background:#f5fbf5;color:var(--sage);}
+.stpu{font-size:10px;color:#bbb;margin-top:2px;text-align:center;}
+
+/* ACTIONS */
+.ract{display:flex;gap:4px;}
+
+/* ZONE CARDS */
+.zcard{background:var(--warm-white);border:1px solid var(--border);border-radius:8px;margin-bottom:7px;overflow:hidden;}
+.zchd{display:flex;align-items:center;gap:8px;padding:9px 11px;cursor:pointer;transition:background .13s;}
+.zchd:hover{background:var(--parchment);}
+.zcnt{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.zcbs{display:flex;flex-direction:column;gap:2px;margin-left:3px;}
+.zcb{padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;}
+.zcft{display:flex;border-top:1px dashed var(--border);}
+.zcfb{flex:1;padding:6px;border:none;background:transparent;font-size:11px;font-weight:600;color:#999;cursor:pointer;transition:background .12s;}
+.zcfb:hover{background:var(--parchment);color:var(--brown);}
+.zcfb.del:hover{background:#fde8e8;color:var(--red);}
+.zcfb+.zcfb{border-left:1px dashed var(--border);}
+
+/* TG BAR */
+.tgbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--parchment);border-top:1px solid var(--border);border-radius:0 0 var(--r) var(--r);}
+.tgcnt{display:flex;gap:6px;flex:1;align-items:center;}
+.tgch{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;}
+.tgch.r{background:#fde8e8;color:var(--red);}
+.tgch.y{background:#fef5e0;color:var(--gold);}
+.bttg{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;background:#2b5278;color:#fff;border:none;border-radius:7px;font-family:'DM Sans';font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.bttg:hover{background:#3a6fa8;}
+.bttg svg{width:14px;height:14px;fill:currentColor;flex-shrink:0;}
+.bttgset{background:transparent;border:1.5px solid #c8d8e8;color:#6a90b0;padding:7px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;}
+.bttgset:hover{background:#edf3f8;color:#2b5278;border-color:#2b5278;}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(20,15,10,.5);backdrop-filter:blur(5px);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s;}
+.ov.on{opacity:1;pointer-events:all;}
+.modal{background:var(--warm-white);border-radius:12px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.17);width:460px;max-width:95vw;max-height:92vh;overflow-y:auto;transform:scale(.96) translateY(8px);transition:transform .2s cubic-bezier(.34,1.56,.64,1);}
+.ov.on .modal{transform:scale(1) translateY(0);}
+.mlg{width:540px;}
+.mhd{padding:17px 20px;border-bottom:1px solid var(--border);background:var(--parchment);border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.mhd h3{font-family:'Playfair Display',serif;font-size:18px;color:var(--brown);}
+.mhd p{font-size:12px;color:#aaa;margin-top:2px;}
+.mbd{padding:20px;}
+.mft{display:flex;gap:8px;padding:13px 20px;border-top:1px solid var(--border);}
+.mft .btn{flex:1;}
+.xbtn{background:none;border:none;font-size:18px;cursor:pointer;color:#bbb;padding:2px 6px;border-radius:4px;line-height:1;}
+.xbtn:hover{background:var(--cream);color:var(--ink);}
+
+/* TOAST */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--brown);color:var(--parchment);padding:11px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 5px 20px rgba(0,0,0,.2);opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;border-left:4px solid var(--amber);pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-left-color:var(--sage);}
+.toast.err{border-left-color:var(--red);}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:#ccc;}
+.empty .ei{font-size:42px;margin-bottom:10px;opacity:.5;}
+
+/* FAB */
+.fab{display:none;position:fixed;bottom:74px;right:14px;z-index:180;width:52px;height:52px;border-radius:50%;background:var(--brown);color:var(--parchment);border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.24);align-items:center;justify-content:center;transition:background .15s;}
+.fab:hover{background:var(--amber);}
+
+/* ADJ SUGGEST */
+.adjdrop{position:absolute;top:100%;left:0;right:0;background:var(--warm-white);border:1px solid var(--border);border-radius:7px;z-index:50;box-shadow:var(--shadow);max-height:175px;overflow-y:auto;}
+.adji{padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background .1s;}
+.adji:hover{background:var(--parchment);}
+.adji:last-child{border-bottom:none;}
+
+/* SIDEBAR TOGGLE */
+.stog{display:none;width:100%;padding:10px 13px;background:var(--parchment);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--brown);cursor:pointer;margin-bottom:9px;text-align:left;}
+.stog .arr{float:right;transition:transform .22s;}
+.stog.open .arr{transform:rotate(180deg);}
+.scoll{overflow:hidden;transition:max-height .3s ease,opacity .22s;}
+
+/* ZONE COLORS */
+.zcolors{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;}
+.zcol{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .12s;}
+.zcol:hover{transform:scale(1.15);}
+
+/* ORDER PREVIEW */
+.oprev{background:#f5f5f5;border-radius:7px;padding:12px 14px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#333;max-height:250px;overflow-y:auto;white-space:pre-wrap;border:1px solid #ddd;}
+.tgbox{background:#edf3f8;border:1px solid #c8d8e8;border-radius:8px;padding:14px;margin-bottom:13px;}
+
+/* PRINT */
+#pa{display:none;}
+
+/* ═══ MOBILE ≤768 ═══ */
+@media(max-width:768px){
+  header{height:50px;padding:0 12px;}
+  .logo h1{font-size:15px;}
+  .page{padding:10px 10px 86px;}
+  .stats{gap:5px;}
+  .sc{padding:7px 10px;}
+  .sv{font-size:19px;}
+  .sl{font-size:8px;}
+  .layout{grid-template-columns:1fr;gap:10px;}
+  .stog{display:block;}
+  /* TG fixed bottom */
+  .tgbar{position:fixed;bottom:0;left:0;right:0;z-index:180;border-radius:0;padding:8px 12px;padding-bottom:calc(8px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(0,0,0,.1);}
+  /* FAB */
+  .fab{display:flex;}
+  /* Table -> card rows */
+  .tbl table thead{display:none;}
+  .tbl table tbody tr{
+    display:grid;
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto auto;
+    padding:12px 13px;gap:6px 10px;
+    border-bottom:1px solid var(--border);
+    border-left:3px solid transparent;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
-  body::before {
-    content:''; position:fixed; inset:0;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events:none; z-index:0;
-  }
+  .tbl td{padding:0;border:none;}
+  .tbl td:nth-child(1){grid-column:1/3;grid-row:1;}
+  .tbl td:nth-child(2){grid-column:1;grid-row:2;align-self:center;}
+  .tbl td:nth-child(3){grid-column:2;grid-row:2;text-align:right;align-self:center;}
+  .tbl td:nth-child(4){grid-column:1;grid-row:3;align-self:center;}
+  .tbl td:nth-child(5){grid-column:2;grid-row:3;align-self:center;}
+  .tbl td:nth-child(6){display:none;}
+  .mkr{width:34px;height:34px;font-size:14px;}
+  .step{height:40px;}
+  .step .sb{width:40px;font-size:21px;}
+  .step input{font-size:14px;width:56px;}
+  .ov.on{align-items:flex-end;}
+  .modal{width:100%!important;max-width:100%!important;border-radius:18px 18px 0 0;margin:0;}
+  .mbd{padding:15px;}
+  .mhd{padding:14px 15px 12px;}
+  .mft{padding:10px 15px;padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+  .toast{bottom:66px;}
+}
+@media(max-width:400px){
+  .sv{font-size:17px;}
+  .sl{display:none;}
+  .sc{padding:7px 8px;}
+}
 
-  /* HEADER */
-  header { position:sticky;top:0;z-index:100;background:var(--brown);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;box-shadow:0 2px 20px rgba(0,0,0,0.2); }
-  .logo { display:flex;align-items:center;gap:14px; }
-  .logo-emblem { font-size:26px;line-height:1; }
-  .logo-text h1 { font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--parchment);letter-spacing:1px;line-height:1; }
-  .logo-text p { font-size:10px;font-weight:500;letter-spacing:4px;text-transform:uppercase;color:var(--gold-light);margin-top:2px; }
-  .header-right { display:flex;align-items:center;gap:24px; }
-  #clock { font-size:15px;font-weight:600;color:var(--parchment);letter-spacing:2px; }
-  #date-disp { font-size:12px;color:var(--gold-light);font-weight:400; }
-
-  /* MAIN */
-  .page { position:relative;z-index:1;max-width:1480px;margin:0 auto;padding:28px 24px; }
-  .page-header { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;gap:12px; }
-  .page-title { font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--brown);line-height:1; }
-  .page-subtitle { font-size:13px;color:var(--amber);font-weight:500;letter-spacing:2px;text-transform:uppercase;margin-top:4px; }
-
-  /* STAT CARDS */
-  .stats-row { display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px; }
-  .stat-card { background:var(--warm-white);border:1px solid var(--border);border-radius:7px;padding:10px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;display:flex;align-items:center;gap:10px; }
-  .stat-card:hover { transform:translateY(-2px);box-shadow:0 6px 20px rgba(26,21,16,0.1); }
-  .stat-card::before { content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber); }
-  .stat-card.s-green::before { background:var(--sage); }
-  .stat-card.s-yellow::before { background:var(--gold); }
-  .stat-card.s-red::before { background:var(--red); }
-  .stat-card.s-cold::before { background:var(--blue-cold); }
-  .stat-icon { font-size:18px;flex-shrink:0; }
-  .stat-text { flex:1;min-width:0; }
-  .stat-label { font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#aaa;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .stat-val { font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink);line-height:1; }
-  .stat-card.s-yellow .stat-val { color:var(--gold); }
-  .stat-card.s-red .stat-val { color:var(--red); }
-
-  /* LAYOUT */
-  .layout { display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start; }
-
-  /* CARD */
-  .card { background:var(--warm-white);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden; }
-  .card-header { padding:16px 20px;border-bottom:1px solid var(--border);background:var(--parchment);display:flex;align-items:center;gap:10px;justify-content:space-between; }
-  .card-header-left { display:flex;align-items:center;gap:10px; }
-  .card-header h2 { font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--brown); }
-  .card-header .icon { font-size:18px; }
-  .card-body { padding:20px; }
-
-  /* BUTTONS */
-  .btn { display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;background:var(--brown);color:var(--parchment);border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
-  .btn:hover { background:var(--amber);transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,112,42,0.3); }
-  .btn.btn-sm { padding:5px 10px;font-size:12px;border-radius:4px; }
-  .btn.btn-ghost { background:transparent;border:1.5px solid var(--border);color:#888; }
-  .btn.btn-ghost:hover { background:var(--parchment);box-shadow:none;transform:none;border-color:#ccc; }
-  .btn.btn-outline-red { background:transparent;border:1.5px solid #e8d5d5;color:var(--red); }
-  .btn.btn-outline-red:hover { background:var(--red);color:#fff;box-shadow:0 4px 16px rgba(192,57,43,0.3); }
-  .btn.btn-outline-sage { background:transparent;border:1.5px solid #d0e8d0;color:var(--sage); }
-  .btn.btn-outline-sage:hover { background:var(--sage);color:#fff; }
-  .btn-icon { padding:5px 8px;font-size:15px; }
-  .btn-print { display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--parchment);border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--brown);cursor:pointer;transition:all 0.15s;white-space:nowrap; }
-  .btn-print:hover { background:#ede4cc;border-color:var(--amber);color:var(--amber); }
-
-  /* FORM */
-  .form-row { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
-  .fg { margin-bottom:12px; }
-  .fg label { display:block;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:5px; }
-  .fg input, .fg select, .fg textarea { width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none; }
-  .fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,112,42,0.12);background:var(--warm-white); }
-  .fg textarea { resize:vertical;min-height:60px; }
-
-  /* ZONE TABS */
-  .zone-tabs { display:flex;flex-wrap:nowrap;gap:6px;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px; }
-  .zone-tabs::-webkit-scrollbar { display:none; }
-  .ztab { padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:#888;font-family:'DM Sans';font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap; }
-  .ztab:hover { border-color:var(--amber);color:var(--amber); }
-  .ztab.active { background:var(--brown);border-color:var(--brown);color:var(--parchment); }
-
-  /* SEARCH */
-  .search-bar { position:relative;margin-bottom:14px; }
-  .search-bar input { width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);color:var(--ink);font-family:'DM Sans';font-size:13px;outline:none;transition:border-color 0.2s,box-shadow 0.2s; }
-  .search-bar input:focus { border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,112,42,0.1);background:var(--warm-white); }
-  .search-bar .s-icon { position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none; }
-
-  /* FILTER PILLS */
-  .filter-row { display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap; }
-  .filter-label { font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px; }
-  .fpill { padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:#777;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s; }
-  .fpill:hover { border-color:var(--amber);color:var(--amber); }
-  .fpill.active-red { background:var(--red-light);border-color:var(--red-light);color:#fff; }
-  .fpill.active-yellow { background:var(--gold);border-color:var(--gold);color:#fff; }
-  .fpill.active-green { background:var(--sage);border-color:var(--sage);color:#fff; }
-
-  /* TABLE */
-  .table-wrap { overflow-x:auto;border-radius:8px;border:1px solid var(--border); }
-  table { width:100%;border-collapse:collapse;font-size:13px; }
-  thead { background:var(--parchment); }
-  thead th { padding:10px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#888;white-space:nowrap;cursor:pointer;user-select:none;transition:color 0.15s;border-bottom:1px solid var(--border); }
-  thead th:hover { color:var(--amber); }
-  tbody tr { border-bottom:1px solid var(--border);transition:background 0.12s;border-left:3px solid transparent; }
-  tbody tr:hover { background:rgba(200,112,42,0.03); }
-  tbody tr:last-child { border-bottom:none; }
-  td { padding:10px 12px;vertical-align:middle; }
-
-  /* ROW MARKER BORDERS */
-  tbody tr.mark-green { border-left-color:var(--sage); }
-  tbody tr.mark-yellow { border-left-color:var(--gold); }
-  tbody tr.mark-red { border-left-color:var(--red); background:rgba(192,57,43,0.025); }
-
-  /* PRODUCT CELL */
-  .prod-name { font-weight:600;color:var(--ink);display:block; }
-  .prod-meta { font-size:11px;color:#aaa;margin-top:2px; }
-
-  /* Zone badges */
-  .zbadge { display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;background:#f0eadc;color:var(--brown); }
-
-  /* QTY */
-  .qty-wrap { min-width:80px; }
-  .qty-display { display:flex;align-items:baseline;gap:4px;cursor:pointer;padding:4px 6px;border-radius:5px;transition:background 0.15s;width:fit-content; }
-  .qty-display:hover { background:var(--parchment); }
-  .qty-num { font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1; }
-  .qty-num.low { color:var(--gold); }
-  .qty-num.empty { color:var(--red); }
-  .qty-unit { font-size:11px;color:#aaa;font-weight:500; }
-  .qty-edit-hint { font-size:9px;color:#ccc;margin-top:1px; }
-  .qty-bar { height:3px;background:#e8e0d0;border-radius:2px;margin-top:3px;overflow:hidden;width:60px; }
-  .qty-bar-fill { height:100%;border-radius:2px;transition:width 0.4s ease; }
-  .qty-inline-form { display:flex;align-items:center;gap:4px; }
-  .qty-inline-input { width:70px;padding:5px 7px;border:1.5px solid var(--amber);border-radius:5px;background:var(--warm-white);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;box-shadow:0 0 0 3px rgba(200,112,42,0.12); }
-  .qty-confirm-btn { padding:4px 7px;background:var(--sage);color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;font-weight:700; }
-  .qty-cancel-btn { padding:4px 6px;background:transparent;border:1px solid #ccc;border-radius:4px;font-size:11px;cursor:pointer;color:#888; }
-
-  /* MARKER BUTTONS */
-  .marker-wrap { display:flex;gap:5px;align-items:center; }
-  .marker-btn { width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all 0.15s;font-size:14px;display:flex;align-items:center;justify-content:center;position:relative;opacity:0.35; }
-  .marker-btn.active { opacity:1;transform:scale(1.15); }
-  .marker-btn:hover { opacity:0.8;transform:scale(1.1); }
-  .marker-btn.mb-green { background:var(--sage);border-color:var(--sage); }
-  .marker-btn.mb-yellow { background:var(--gold);border-color:var(--gold); }
-  .marker-btn.mb-red { background:var(--red);border-color:var(--red); }
-  .marker-btn.mb-green.active { border-color:#2d5a30;box-shadow:0 0 0 3px rgba(90,122,92,0.3); }
-  .marker-btn.mb-yellow.active { border-color:#8a6a20;box-shadow:0 0 0 3px rgba(184,148,58,0.3); }
-  .marker-btn.mb-red.active { border-color:#8a1a10;box-shadow:0 0 0 3px rgba(192,57,43,0.3); animation:pulse-red 1.5s infinite; }
-  @keyframes pulse-red { 0%,100%{box-shadow:0 0 0 3px rgba(192,57,43,0.3);}50%{box-shadow:0 0 0 6px rgba(192,57,43,0.1);} }
-
-  /* ORDER QTY */
-  .order-qty-wrap { display:flex;flex-direction:column;gap:2px; }
-  .order-qty-inp { width:70px;padding:5px 7px;border:1.5px solid var(--border);border-radius:5px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;text-align:center;outline:none;transition:border-color 0.15s,box-shadow 0.15s; }
-  .order-qty-inp:focus { border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,112,42,0.12);background:var(--warm-white); }
-  .order-qty-inp.has-val { border-color:var(--sage);background:#f0faf0; }
-  .order-note-inp { width:120px;padding:4px 7px;border:1.5px solid var(--border);border-radius:5px;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:11px;outline:none;transition:border-color 0.15s; }
-  .order-note-inp:focus { border-color:var(--amber);box-shadow:0 0 0 2px rgba(200,112,42,0.1);background:var(--warm-white); }
-
-  /* ROW ACTIONS */
-  .row-actions { display:flex;gap:4px;align-items:center; }
-
-  /* EXPIRY */
-  .expiry-cell { font-size:12px;white-space:nowrap; }
-  .exp-ok { color:var(--sage);font-weight:600; }
-  .exp-soon { color:#e67e22;font-weight:700; }
-  .exp-expired { color:var(--red);font-weight:700; }
-  .exp-none { color:#ccc; }
-  .exp-days { font-size:10px;margin-top:2px;display:block; }
-
-  /* STATUS BADGE */
-  .sbadge { display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap; }
-  .sb-ok { background:#e8f5e8;color:var(--sage); }
-  .sb-low { background:#fef5e0;color:var(--gold); }
-  .sb-empty { background:#fde8e8;color:var(--red); }
-  .sb-expire { background:#fde8cc;color:#c0601a; }
-  .dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
-  .dot-ok { background:var(--sage); }
-  .dot-low { background:var(--gold);animation:blink 2s infinite; }
-  .dot-empty { background:var(--red);animation:blink 1s infinite; }
-  .dot-expire { background:#e67e22;animation:blink 1.5s infinite; }
-  @keyframes blink { 0%,100%{opacity:1;}50%{opacity:0.3;} }
-
-  /* EMPTY */
-  .empty-state { text-align:center;padding:60px;color:#ccc; }
-  .empty-state .e-icon { font-size:52px;margin-bottom:12px;opacity:0.5; }
-  .empty-state p { font-size:14px;letter-spacing:1px; }
-
-  /* MODAL */
-  .overlay { position:fixed;inset:0;background:rgba(26,21,16,0.55);backdrop-filter:blur(6px);z-index:999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s; }
-  .overlay.open { opacity:1;pointer-events:all; }
-  .modal { background:var(--warm-white);border-radius:12px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.2);width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:scale(0.96) translateY(10px);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1); }
-  .overlay.open .modal { transform:scale(1) translateY(0); }
-  .modal.modal-lg { width:560px; }
-  .modal-head { padding:20px 24px;border-bottom:1px solid var(--border);background:var(--parchment);border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between; }
-  .modal-head h3 { font-family:'Playfair Display',serif;font-size:20px;color:var(--brown); }
-  .modal-head p { font-size:12px;color:#888;margin-top:3px; }
-  .modal-body { padding:24px; }
-  .modal-foot { display:flex;gap:8px;padding:16px 24px;border-top:1px solid var(--border); }
-  .modal-foot .btn { flex:1; }
-  .close-x { background:none;border:none;font-size:20px;cursor:pointer;color:#aaa;padding:2px 6px;border-radius:4px;line-height:1; }
-  .close-x:hover { background:var(--cream);color:var(--ink); }
-
-  /* TOAST */
-  .toast { position:fixed;bottom:24px;right:24px;background:var(--brown);color:var(--parchment);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.2);transform:translateY(80px) scale(0.95);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;border-left:4px solid var(--amber); }
-  .toast.show { transform:translateY(0) scale(1);opacity:1; }
-  .toast.err { border-left-color:var(--red); }
-  .toast.ok { border-left-color:var(--sage); }
-
-  /* ZONE SIDEBAR CARDS */
-  .zone-card { background:var(--warm-white);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;transition:box-shadow 0.15s; }
-  .zone-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); }
-  .zone-card-header { display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background 0.15s; }
-  .zone-card-header:hover { background:var(--parchment); }
-  .zone-card-title { font-weight:700;font-size:13px;color:var(--brown);flex:1;min-width:0; }
-  .zone-card-temp { font-size:10px;color:#aaa;margin-top:1px; }
-  .zone-card-count { font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink); }
-  .zone-card-labels { display:flex;flex-direction:column;gap:2px;margin-left:4px; }
-  .zone-mini-badge { padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;white-space:nowrap; }
-  .zone-card-actions { display:flex;border-top:1px dashed var(--border); }
-  .zone-action-btn { flex:1;padding:6px 8px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#888;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:4px; }
-  .zone-action-btn:hover { background:var(--parchment);color:var(--brown); }
-  .zone-action-btn.danger:hover { background:#fde8e8;color:var(--red); }
-  .zone-action-btn + .zone-action-btn { border-left:1px dashed var(--border); }
-
-  /* ZONE EDIT INLINE */
-  .zone-edit-form { padding:10px 12px;background:var(--parchment);border-top:1px solid var(--border); }
-  .zone-edit-row { display:grid;grid-template-columns:50px 1fr 1fr;gap:6px;margin-bottom:8px; }
-
-  /* TELEGRAM BAR */
-  .tg-bar { display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--parchment);border-top:1px solid var(--border);border-radius:0 0 10px 10px;flex-wrap:wrap; }
-  .tg-bar-label { font-size:12px;font-weight:600;color:var(--brown);flex-shrink:0; }
-  .tg-count { display:flex;gap:8px;flex:1; }
-  .tg-badge { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700; }
-  .tg-badge.urgent { background:#fde8e8;color:var(--red); }
-  .tg-badge.soon { background:#fef5e0;color:var(--gold); }
-  .btn-tg { display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:#2b5278;color:#fff;border:none;border-radius:7px;font-family:'DM Sans';font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
-  .btn-tg:hover { background:#3a6fa8;transform:translateY(-1px);box-shadow:0 4px 16px rgba(43,82,120,0.35); }
-  .btn-tg svg { width:16px;height:16px;fill:currentColor; }
-  .btn-tg-settings { background:transparent;border:1.5px solid #c8d8e8;color:#6a90b0;padding:8px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap; }
-  .btn-tg-settings:hover { background:#edf3f8;border-color:#2b5278;color:#2b5278; }
-
-  /* TELEGRAM MODALS */
-  .tg-settings-box { background:#edf3f8;border:1px solid #c8d8e8;border-radius:8px;padding:16px;margin-bottom:16px; }
-  .tg-settings-box label { color:#3a6090; }
-  .tg-settings-box input { background:#fff;border-color:#c8d8e8; }
-  .order-preview { background:#f5f5f5;border-radius:8px;padding:14px 16px;font-family:'JetBrains Mono','Courier New',monospace;font-size:12px;line-height:1.7;color:#333;max-height:280px;overflow-y:auto;white-space:pre-wrap;border:1px solid #ddd; }
-
-  /* QUICK ADJUST */
-  .adj-suggestions-dropdown { position:absolute;top:100%;left:0;right:0;background:var(--warm-white);border:1px solid var(--border);border-radius:6px;z-index:50;box-shadow:var(--shadow);max-height:200px;overflow-y:auto; }
-  .adj-suggestion-item { padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);transition:background 0.1s; }
-  .adj-suggestion-item:hover { background:var(--parchment); }
-  .adj-suggestion-item:last-child { border-bottom:none; }
-
-  /* SIDEBAR */
-  .sidebar-toggle { display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--parchment);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;color:var(--brown);cursor:pointer;width:100%;margin-bottom:12px;transition:background 0.15s; }
-  .sidebar-toggle:hover { background:#ede4cc; }
-  .sidebar-toggle .arrow { margin-left:auto;transition:transform 0.25s; }
-  .sidebar-toggle.open .arrow { transform:rotate(180deg); }
-  .sidebar-collapsible { transition:max-height 0.35s ease,opacity 0.25s;overflow:hidden; }
-
-  /* PRINT */
-  #print-area { display:none; }
-  @keyframes blink-sync{0%,100%{opacity:1}50%{opacity:0.4}}
-
-  /* MOBILE */
-  @media (max-width:1024px) { .layout{grid-template-columns:1fr;} .stats-row{grid-template-columns:repeat(3,1fr);} }
-  @media (max-width:768px) {
-    header { padding:0 14px;height:52px; }
-    .logo-text h1 { font-size:15px; }
-    .logo-text p { display:none; }
-    #date-disp { display:none; }
-    .page { padding:14px 12px; }
-    .page-title { font-size:26px; }
-    .page-header { flex-wrap:wrap;gap:10px;margin-bottom:16px; }
-    .stats-row { grid-template-columns:repeat(3,1fr);gap:6px; }
-    .stat-val { font-size:22px; }
-    .stat-icon { font-size:16px; }
-    .layout { grid-template-columns:1fr;gap:12px; }
-    .sidebar-toggle { display:flex; }
-    .overlay { align-items:flex-end;padding:0; }
-    .modal { width:100%!important;max-width:100%!important;max-height:90vh;margin:0;border-radius:20px 20px 0 0;overflow-y:auto; }
-    .modal-body { padding:16px; }
-    .modal-head { padding:16px 16px 12px; }
-    .modal-foot { padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom)); }
-    .tg-bar { position:fixed;bottom:0;left:0;right:0;z-index:200;border-radius:0;padding:10px 14px;padding-bottom:calc(10px + env(safe-area-inset-bottom));box-shadow:0 -3px 16px rgba(0,0,0,0.12);gap:8px; }
-    .tg-bar-label { display:none; }
-    body { padding-bottom:70px; }
-    /* Table → cards */
-    .table-wrap table thead { display:none; }
-    .table-wrap table tbody tr { display:grid;grid-template-areas:'name name name' 'zone expiry status' 'qty markers order' 'actions actions actions';padding:12px;gap:6px 8px;border-left:3px solid transparent; }
-    .table-wrap table tbody tr td { display:block;padding:0;border:none; }
-    .table-wrap table tbody tr td:nth-child(1) { grid-area:name; }
-    .table-wrap table tbody tr td:nth-child(2) { grid-area:zone; }
-    .table-wrap table tbody tr td:nth-child(3) { grid-area:qty; }
-    .table-wrap table tbody tr td:nth-child(4) { grid-area:expiry;justify-self:end;text-align:right; }
-    .table-wrap table tbody tr td:nth-child(5) { grid-area:status; }
-    .table-wrap table tbody tr td:nth-child(6) { grid-area:markers; }
-    .table-wrap table tbody tr td:nth-child(7) { grid-area:order; }
-    .table-wrap table tbody tr td:nth-child(8) { grid-area:actions;display:flex;gap:6px; }
-    .marker-btn { width:34px;height:34px;font-size:16px; }
-    .order-note-inp { width:100%;min-width:0; }
-  }
-  @media (max-width:400px) {
-    .page { padding:10px 8px; }
-    .stats-row { grid-template-columns:repeat(2,1fr);gap:6px; }
-    .stat-val { font-size:22px; }
-  }
-
-  @media print {
-    body * { visibility:hidden; }
-    #print-area, #print-area * { visibility:visible; }
-    #print-area { display:block!important;position:absolute;top:0;left:0;width:100%;padding:20px;font-family:'DM Sans',Arial,sans-serif; }
-    body { background:#fff!important;padding:0!important; }
-    .print-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #333; }
-    .print-logo { display:flex;align-items:center;gap:10px; }
-    .print-title { font-size:22px;font-weight:900;color:#1a1510; }
-    .print-subtitle { font-size:11px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:2px; }
-    .print-meta { font-size:11px;color:#666;text-align:right;line-height:1.8; }
-    .print-zone-block { page-break-inside:avoid;margin-bottom:16px; }
-    .print-zone-title { font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#444;margin:20px 0 6px;padding:5px 8px;background:#f5f0e8;border-left:3px solid #3d2b1a; }
-    .print-table { width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px; }
-    .print-table th { padding:7px 10px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#555;border:1px solid #bbb;background:#faf7f0; }
-    .print-table td { padding:9px 10px;border:1px solid #ddd;vertical-align:middle; }
-    .print-table tr:nth-child(even) td { background:#fdfaf4; }
-    .print-table td.col-name { font-weight:500;width:40%; }
-    .print-table td.col-marker { text-align:center;width:12%; }
-    .print-table td.col-qty { font-weight:700;font-size:13px;text-align:center;width:18%;white-space:nowrap; }
-    .print-table td.col-qty.low { color:#b8943a; }
-    .print-table td.col-qty.empty { color:#c0392b; }
-    .print-table th.col-note, .print-table td.col-note { width:30%;background:#fff!important; }
-    .print-footer { margin-top:24px;padding-top:8px;border-top:1px solid #ccc;font-size:10px;color:#aaa;display:flex;justify-content:space-between; }
-  }
+/* PRINT */
+@media print{
+  body *{visibility:hidden;}
+  #pa,#pa *{visibility:visible;}
+  #pa{display:block!important;position:absolute;top:0;left:0;width:100%;padding:18px;font-family:'DM Sans',Arial,sans-serif;}
+  body{background:#fff!important;}
+  .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #333;}
+  .pt{font-size:20px;font-weight:900;color:#1a1510;}
+  .ps{font-size:10px;color:#888;letter-spacing:2px;text-transform:uppercase;}
+  .pm{font-size:11px;color:#666;text-align:right;line-height:1.7;}
+  .pzb{page-break-inside:avoid;margin-bottom:12px;}
+  .pzt{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#444;margin:14px 0 5px;padding:4px 8px;background:#f5f0e8;border-left:3px solid #3d2b1a;}
+  .ptbl{width:100%;border-collapse:collapse;font-size:12px;}
+  .ptbl th{padding:6px 9px;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;color:#555;border:1px solid #bbb;background:#faf7f0;}
+  .ptbl td{padding:7px 9px;border:1px solid #ddd;}
+  .ptbl tr:nth-child(even) td{background:#fdfaf4;}
+  .pf{margin-top:18px;padding-top:7px;border-top:1px solid #ccc;font-size:10px;color:#aaa;display:flex;justify-content:space-between;}
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">
-    <div class="logo-emblem">🐑</div>
-    <div class="logo-text">
-      <h1>Зони зберігання</h1>
-      <p>Контроль продуктів · Ресторан</p>
-    </div>
-  </div>
-  <div class="header-right">
-    <div id="sync-badge" style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(255,255,255,0.06);">
-      <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--gold-light);display:inline-block;flex-shrink:0;animation:blink-sync 1.5s infinite;transition:background 0.4s;"></span>
-      <span id="sync-label" style="font-size:11px;font-weight:600;color:var(--gold-light);letter-spacing:1px;white-space:nowrap;">Підключення...</span>
-    </div>
-    <div>
-      <div id="clock">--:--:--</div>
-      <div id="date-disp"></div>
-    </div>
+  <div class="logo"><span>🐑</span><h1>Зони зберігання</h1></div>
+  <div class="hdr-r">
+    <span id="sdot" class="con"></span>
+    <div id="clock">--:--</div>
   </div>
 </header>
 
 <div class="page">
 
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div>
-      <div class="page-title">Зони зберігання</div>
-      <div class="page-subtitle">Актуальний стан запасів</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn-print" onclick="printTable()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
-        Друкувати
-      </button>
-      <button class="btn" style="width:auto;padding:10px 20px;" onclick="openAddModal()">
-        + Додати продукт
-      </button>
-    </div>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-icon">📦</div>
-      <div class="stat-text"><div class="stat-label">Всього позицій</div><div class="stat-val" id="s-total">0</div></div>
-    </div>
-    <div class="stat-card s-cold">
-      <div class="stat-icon">🗺️</div>
-      <div class="stat-text"><div class="stat-label">Зон зберігання</div><div class="stat-val" id="s-zones">0</div></div>
-    </div>
-    <div class="stat-card s-green">
-      <div class="stat-icon">🟢</div>
-      <div class="stat-text"><div class="stat-label">В наявності</div><div class="stat-val" id="s-green">0</div></div>
-    </div>
-    <div class="stat-card s-yellow">
-      <div class="stat-icon">🟡</div>
-      <div class="stat-text"><div class="stat-label">Під контроль</div><div class="stat-val" id="s-yellow">0</div></div>
-    </div>
-    <div class="stat-card s-red">
-      <div class="stat-icon">🔴</div>
-      <div class="stat-text"><div class="stat-label">Критично мало</div><div class="stat-val" id="s-red">0</div></div>
-    </div>
+  <div class="stats">
+    <div class="sc"><span class="se">📦</span><div><div class="sv" id="s-total">0</div><div class="sl">Позицій</div></div></div>
+    <div class="sc"><span class="se">🟢</span><div><div class="sv" style="color:var(--sage)" id="s-green">0</div><div class="sl">В наявн.</div></div></div>
+    <div class="sc"><span class="se">🟡</span><div><div class="sv" style="color:var(--gold)" id="s-yellow">0</div><div class="sl">Контроль</div></div></div>
+    <div class="sc"><span class="se">🔴</span><div><div class="sv" style="color:var(--red)" id="s-red">0</div><div class="sl">Критично</div></div></div>
+    <div class="sc"><span class="se">🗺️</span><div><div class="sv" id="s-zones">0</div><div class="sl">Зон</div></div></div>
   </div>
 
   <div class="layout">
-
-    <!-- LEFT SIDEBAR -->
+    <!-- SIDEBAR -->
     <div>
-      <button class="sidebar-toggle" id="sidebar-btn" onclick="toggleSidebar()">
-        🗺️ Зони та коригування
-        <span class="arrow">▼</span>
-      </button>
-      <div class="sidebar-collapsible" id="sidebar-content">
-
-        <!-- ZONES OVERVIEW -->
-        <div class="card" style="margin-bottom:14px;">
-          <div class="card-header">
-            <div class="card-header-left">
-              <span class="icon">🗺️</span>
-              <h2>Зони зберігання</h2>
-            </div>
-            <button class="btn btn-sm" onclick="openZoneModal()" title="Додати нову зону">+ Зона</button>
-          </div>
-          <div class="card-body" style="padding:12px;">
-            <div id="zone-overview">
-              <div style="text-align:center;padding:20px;color:#ccc;font-size:13px;">Завантаження...</div>
-            </div>
-          </div>
+      <button class="stog" id="stog" onclick="tgSide()">🗺️ Зони та коригування <span class="arr">▼</span></button>
+      <div class="scoll" id="scoll">
+        <div class="card" style="margin-bottom:11px;">
+          <div class="chd"><h2>🗺️ Зони</h2><button class="btn sm" onclick="openZM()">+ Зона</button></div>
+          <div class="cbd" style="padding:9px;"><div id="zov"><div style="text-align:center;padding:14px;color:#ccc;font-size:12px;">Завантаження...</div></div></div>
         </div>
-
-        <!-- QUICK ADJUST -->
         <div class="card">
-          <div class="card-header">
-            <div class="card-header-left"><span class="icon">⚡</span><h2>Швидке коригування</h2></div>
-          </div>
-          <div class="card-body">
+          <div class="chd"><h2>⚡ Коригування</h2></div>
+          <div class="cbd">
             <div class="fg" style="position:relative;">
-              <label>Назва або артикул продукту</label>
-              <input type="text" id="adj-q" placeholder="Почніть вводити..." oninput="suggestAdj()" autocomplete="off" />
-              <div id="adj-suggestions" style="position:relative;"></div>
+              <label>Продукт</label>
+              <input type="text" id="adj-q" placeholder="Почніть вводити..." oninput="sAdj()" autocomplete="off"/>
+              <div id="adj-sug" style="position:relative;"></div>
             </div>
-            <div class="form-row">
-              <div class="fg">
-                <label>Операція</label>
-                <select id="adj-op">
-                  <option value="add">➕ Прихід</option>
-                  <option value="sub">➖ Витрата</option>
-                  <option value="set">📋 Встановити</option>
-                </select>
+            <div class="r2">
+              <div class="fg"><label>Операція</label>
+                <select id="adj-op"><option value="add">➕ Прихід</option><option value="sub">➖ Витрата</option><option value="set">📋 Встановити</option></select>
               </div>
-              <div class="fg">
-                <label>Кількість</label>
-                <input type="number" id="adj-val" placeholder="0" min="0" />
-              </div>
+              <div class="fg"><label>Кількість</label><input type="number" id="adj-val" placeholder="0" min="0"/></div>
             </div>
-            <button class="btn" onclick="doAdjust()">Застосувати зміну</button>
+            <button class="btn" style="width:100%;" onclick="doAdj()">Застосувати</button>
           </div>
         </div>
+      </div>
+    </div>
 
-      </div><!-- /sidebar-collapsible -->
-    </div><!-- /left -->
-
-    <!-- RIGHT: TABLE -->
+    <!-- MAIN -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-header-left">
-          <span class="icon">📋</span><h2>Список продуктів</h2>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <span style="font-size:11px;color:#aaa;">
-            <span style="color:var(--sage);">●</span> В наявн.
-            <span style="color:var(--gold);margin-left:6px;">●</span> Контроль
-            <span style="color:var(--red);margin-left:6px;">●</span> Критично
-          </span>
+      <div class="chd">
+        <h2>📋 Список продуктів</h2>
+        <div style="display:flex;gap:6px;">
+          <button class="btn ghost sm" onclick="printAll()">🖨️</button>
+          <button class="btn sm" onclick="openAdd()">+ Додати</button>
         </div>
       </div>
-      <div class="card-body" style="padding-bottom:0;">
-        <div class="search-bar">
-          <span class="s-icon">🔍</span>
-          <input type="text" id="search-inp" placeholder="Пошук продукту..." oninput="renderTable()" />
-        </div>
-        <div class="zone-tabs" id="zone-tabs">
-          <button class="ztab active" data-z="all" onclick="setZone(this)">Всі зони</button>
-        </div>
-        <div class="filter-row">
-          <span class="filter-label">МАРКЕР:</span>
-          <button class="fpill" id="fpill-green" onclick="toggleMarkerFilter('green')">🟢 В наявності</button>
-          <button class="fpill" id="fpill-yellow" onclick="toggleMarkerFilter('yellow')">🟡 Під контроль</button>
-          <button class="fpill" id="fpill-red" onclick="toggleMarkerFilter('red')">🔴 Критично</button>
-          <button class="fpill" id="fpill-low" onclick="toggleFilter(this,'low')" data-f="low">⚠️ Малий запас</button>
-          <button class="fpill" id="fpill-empty" onclick="toggleFilter(this,'empty')" data-f="empty">❌ Відсутні</button>
+      <div class="cbd" style="padding-bottom:0;">
+        <div class="srch"><span class="ico">🔍</span><input type="text" id="srch" placeholder="Пошук..." oninput="rt()"/></div>
+        <div class="ztabs" id="ztabs"><button class="ztab on" data-z="all" onclick="setZ(this)">Всі</button></div>
+        <div class="pills">
+          <button class="pill" id="fp-g" onclick="mf('green')">🟢</button>
+          <button class="pill" id="fp-y" onclick="mf('yellow')">🟡</button>
+          <button class="pill" id="fp-r" onclick="mf('red')">🔴</button>
+          <button class="pill" id="fp-low" onclick="tf(this,'low')">⚠️ мало</button>
+          <button class="pill" id="fp-empty" onclick="tf(this,'empty')">❌ відсутні</button>
         </div>
       </div>
-
-      <div class="table-wrap">
+      <div class="tbl">
         <table>
-          <thead>
-            <tr>
-              <th onclick="sortBy('name')" style="min-width:160px;">Продукт ↕</th>
-              <th onclick="sortBy('zone')">Зона ↕</th>
-              <th onclick="sortBy('qty')" style="min-width:100px;">Залишок ↕</th>
-              <th onclick="sortBy('expiry')" style="min-width:110px;">Термін ↕</th>
-              <th>Статус</th>
-              <th style="text-align:center;min-width:100px;" title="🟢 в наявності · 🟡 під контроль · 🔴 критично">Маркер</th>
-              <th style="min-width:110px;">Замовлення</th>
-              <th>Дії</th>
-            </tr>
-          </thead>
+          <thead><tr>
+            <th onclick="sb('name')">Продукт ↕</th>
+            <th onclick="sb('zone')">Зона ↕</th>
+            <th onclick="sb('qty')" style="text-align:right;">Залишок ↕</th>
+            <th style="text-align:center;">Маркер</th>
+            <th>Дозамовити</th>
+            <th>Дії</th>
+          </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
-        <div id="empty-st" class="empty-state" style="display:none;">
-          <div class="e-icon">🥗</div>
-          <p>Продуктів не знайдено</p>
-        </div>
+        <div id="emst" class="empty" style="display:none;"><div class="ei">🥗</div><p>Продуктів не знайдено</p></div>
       </div>
-
-      <!-- TG BAR -->
-      <div class="tg-bar" id="tg-bar">
-        <span class="tg-bar-label">📋 До замовлення:</span>
-        <div class="tg-count">
-          <span class="tg-badge urgent" id="tg-red-count" style="display:none">🔴 <span id="tg-rc">0</span> критично</span>
-          <span class="tg-badge soon" id="tg-yellow-count" style="display:none">🟡 <span id="tg-yc">0</span> під контроль</span>
-          <span id="tg-none-label" style="font-size:12px;color:#aaa;">Позначте продукти маркером</span>
+      <div class="tgbar">
+        <div class="tgcnt">
+          <span class="tgch r" id="tgrc" style="display:none">🔴 <span id="tgrn">0</span></span>
+          <span class="tgch y" id="tgyc" style="display:none">🟡 <span id="tgyn">0</span></span>
+          <span id="tgnone" style="font-size:12px;color:#bbb;">Позначте маркером</span>
         </div>
-        <button class="btn-tg-settings" onclick="openTgSettings()">⚙️ Налаштування</button>
-        <button class="btn-tg" onclick="openTgSend()" id="btn-send-tg" disabled style="opacity:0.4;">
+        <button class="bttgset" onclick="openTgSet()">⚙️</button>
+        <button class="bttg" onclick="openTgSend()" id="btntg" disabled style="opacity:.4">
           <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
           Telegram
         </button>
       </div>
-    </div><!-- /right card -->
-
-  </div><!-- /layout -->
-</div><!-- /page -->
-
-<!-- PRINT AREA -->
-<div id="print-area"></div>
-
-<!-- ===== ADD MODAL ===== -->
-<div class="overlay" id="add-modal">
-  <div class="modal">
-    <div class="modal-head">
-      <div><h3>➕ Додати продукт</h3></div>
-      <button class="close-x" onclick="closeModals()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="fg"><label>Назва продукту *</label><input type="text" id="a-name" placeholder="напр. Куряче філе" /></div>
-      <div class="form-row">
-        <div class="fg"><label>Категорія</label>
-          <select id="a-cat">
-            <option>М'ясо та птиця</option><option>Риба та морепродукти</option>
-            <option>Овочі та фрукти</option><option>Молочні продукти</option>
-            <option>Яйця</option><option>Крупи та борошно</option>
-            <option>Консерви та соуси</option><option>Спеції та приправи</option>
-            <option>Алкоголь</option><option>Безалкогольні напої</option>
-            <option>Хліб та випічка</option><option>Заморожені продукти</option>
-            <option>Олії та жири</option><option>Інше</option>
-          </select>
-        </div>
-        <div class="fg"><label>Зона зберігання *</label><select id="a-zone"></select></div>
-      </div>
-      <div class="form-row">
-        <div class="fg"><label>Одиниця виміру</label>
-          <select id="a-unit">
-            <option value="кг">кг</option><option value="г">г</option>
-            <option value="л">л</option><option value="мл">мл</option>
-            <option value="шт">шт</option><option value="упак">упак</option>
-            <option value="пляш">пляш</option><option value="пач">пач</option>
-          </select>
-        </div>
-        <div class="fg"><label>Артикул</label><input type="text" id="a-sku" placeholder="напр. CHKN-FLT" /></div>
-      </div>
-      <div class="form-row">
-        <div class="fg"><label>Кількість *</label><input type="number" id="a-qty" placeholder="0" min="0" step="0.1" /></div>
-        <div class="fg"><label>Мінімальний запас</label><input type="number" id="a-min" placeholder="5" min="0" step="0.1" /></div>
-      </div>
-      <div class="form-row">
-        <div class="fg"><label>Термін придатності</label><input type="date" id="a-exp" /></div>
-        <div class="fg"><label>Постачальник</label><input type="text" id="a-sup" placeholder="напр. АТБ, Metro" /></div>
-      </div>
-      <div class="fg"><label>Примітка</label><input type="text" id="a-note" placeholder="Додаткова інформація..." /></div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModals()">Скасувати</button>
-      <button class="btn" onclick="addItem()">Додати продукт</button>
     </div>
   </div>
 </div>
 
-<!-- ===== EDIT MODAL ===== -->
-<div class="overlay" id="edit-modal">
+<button class="fab" onclick="openAdd()">+</button>
+<div id="pa"></div>
+
+<!-- ADD -->
+<div class="ov" id="m-add">
   <div class="modal">
-    <div class="modal-head">
-      <div><h3>✏️ Редагувати продукт</h3></div>
-      <button class="close-x" onclick="closeModals()">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="e-id" />
-      <div class="fg"><label>Назва продукту</label><input type="text" id="e-name" /></div>
-      <div class="form-row">
+    <div class="mhd"><div><h3>➕ Новий продукт</h3></div><button class="xbtn" onclick="cm()">✕</button></div>
+    <div class="mbd">
+      <div class="fg"><label>Назва *</label><input type="text" id="a-name" placeholder="напр. Куряче філе"/></div>
+      <div class="r2">
+        <div class="fg"><label>Зона *</label><select id="a-zone"></select></div>
         <div class="fg"><label>Категорія</label>
-          <select id="e-cat">
-            <option>М'ясо та птиця</option><option>Риба та морепродукти</option>
-            <option>Овочі та фрукти</option><option>Молочні продукти</option>
-            <option>Яйця</option><option>Крупи та борошно</option>
-            <option>Консерви та соуси</option><option>Спеції та приправи</option>
-            <option>Алкоголь</option><option>Безалкогольні напої</option>
-            <option>Хліб та випічка</option><option>Заморожені продукти</option>
-            <option>Олії та жири</option><option>Інше</option>
-          </select>
+          <select id="a-cat"><option>М'ясо та птиця</option><option>Риба та морепродукти</option><option>Овочі та фрукти</option><option>Молочні продукти</option><option>Яйця</option><option>Крупи та борошно</option><option>Консерви та соуси</option><option>Спеції та приправи</option><option>Алкоголь</option><option>Безалкогольні напої</option><option>Хліб та випічка</option><option>Олії та жири</option><option>Інше</option></select>
         </div>
+      </div>
+      <div class="r2">
+        <div class="fg"><label>Кількість *</label><input type="number" id="a-qty" placeholder="0" min="0" step="0.1"/></div>
+        <div class="fg"><label>Одиниця</label>
+          <select id="a-unit"><option value="кг">кг</option><option value="г">г</option><option value="л">л</option><option value="мл">мл</option><option value="шт">шт</option><option value="упак">упак</option><option value="пляш">пляш</option><option value="пач">пач</option></select>
+        </div>
+      </div>
+      <div class="r2">
+        <div class="fg"><label>Мін. запас</label><input type="number" id="a-min" placeholder="0" min="0" step="0.1"/></div>
+        <div class="fg"><label>Термін прид.</label><input type="date" id="a-exp"/></div>
+      </div>
+      <div class="fg"><label>Примітка</label><input type="text" id="a-note" placeholder="..."/></div>
+    </div>
+    <div class="mft"><button class="btn ghost" onclick="cm()">Скасувати</button><button class="btn" onclick="addIt()">Додати</button></div>
+  </div>
+</div>
+
+<!-- EDIT -->
+<div class="ov" id="m-edit">
+  <div class="modal">
+    <div class="mhd"><div><h3>✏️ Редагувати</h3></div><button class="xbtn" onclick="cm()">✕</button></div>
+    <div class="mbd">
+      <input type="hidden" id="e-id"/>
+      <div class="fg"><label>Назва</label><input type="text" id="e-name"/></div>
+      <div class="r2">
         <div class="fg"><label>Зона</label><select id="e-zone"></select></div>
-      </div>
-      <div class="form-row">
-        <div class="fg"><label>Одиниця виміру</label>
-          <select id="e-unit">
-            <option value="кг">кг</option><option value="г">г</option>
-            <option value="л">л</option><option value="мл">мл</option>
-            <option value="шт">шт</option><option value="упак">упак</option>
-            <option value="пляш">пляш</option><option value="пач">пач</option>
-          </select>
+        <div class="fg"><label>Категорія</label>
+          <select id="e-cat"><option>М'ясо та птиця</option><option>Риба та морепродукти</option><option>Овочі та фрукти</option><option>Молочні продукти</option><option>Яйця</option><option>Крупи та борошно</option><option>Консерви та соуси</option><option>Спеції та приправи</option><option>Алкоголь</option><option>Безалкогольні напої</option><option>Хліб та випічка</option><option>Олії та жири</option><option>Інше</option></select>
         </div>
-        <div class="fg"><label>Артикул</label><input type="text" id="e-sku" /></div>
       </div>
-      <div class="form-row">
-        <div class="fg"><label>Кількість</label><input type="number" id="e-qty" min="0" step="0.1" /></div>
-        <div class="fg"><label>Мінімальний запас</label><input type="number" id="e-min" min="0" step="0.1" /></div>
+      <div class="r2">
+        <div class="fg"><label>Кількість</label><input type="number" id="e-qty" min="0" step="0.1"/></div>
+        <div class="fg"><label>Одиниця</label>
+          <select id="e-unit"><option value="кг">кг</option><option value="г">г</option><option value="л">л</option><option value="мл">мл</option><option value="шт">шт</option><option value="упак">упак</option><option value="пляш">пляш</option><option value="пач">пач</option></select>
+        </div>
       </div>
-      <div class="form-row">
-        <div class="fg"><label>Термін придатності</label><input type="date" id="e-exp" /></div>
-        <div class="fg"><label>Постачальник</label><input type="text" id="e-sup" /></div>
+      <div class="r2">
+        <div class="fg"><label>Мін. запас</label><input type="number" id="e-min" min="0" step="0.1"/></div>
+        <div class="fg"><label>Термін прид.</label><input type="date" id="e-exp"/></div>
       </div>
-      <div class="fg"><label>Примітка</label><input type="text" id="e-note" /></div>
+      <div class="r2">
+        <div class="fg"><label>Постачальник</label><input type="text" id="e-sup"/></div>
+        <div class="fg"><label>Артикул</label><input type="text" id="e-sku"/></div>
+      </div>
+      <div class="fg"><label>Примітка</label><input type="text" id="e-note"/></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-outline-red" style="flex:0 0 auto;padding:10px 14px;" onclick="deleteCurrentItem()">Видалити</button>
-      <button class="btn btn-ghost" onclick="closeModals()">Скасувати</button>
-      <button class="btn" onclick="saveEdit()">Зберегти</button>
+    <div class="mft">
+      <button class="btn del" style="flex:0 0 auto;padding:9px 12px;" onclick="delCur()">🗑</button>
+      <button class="btn ghost" onclick="cm()">Скасувати</button>
+      <button class="btn" onclick="saveEd()">Зберегти</button>
     </div>
   </div>
 </div>
 
-<!-- ===== ZONE MODAL ===== -->
-<div class="overlay" id="zone-modal">
+<!-- ZONE MODAL -->
+<div class="ov" id="m-zone">
   <div class="modal">
-    <div class="modal-head">
-      <div>
-        <h3 id="zone-modal-title">➕ Нова зона зберігання</h3>
-        <p id="zone-modal-sub">Заповніть інформацію про зону</p>
+    <div class="mhd"><div><h3 id="zm-title">➕ Нова зона</h3></div><button class="xbtn" onclick="cm()">✕</button></div>
+    <div class="mbd">
+      <input type="hidden" id="zm-id"/>
+      <div class="r2" style="grid-template-columns:62px 1fr;">
+        <div class="fg"><label>Іконка</label><input type="text" id="zm-icon" placeholder="📦" maxlength="4" style="text-align:center;font-size:22px;"/></div>
+        <div class="fg"><label>Назва *</label><input type="text" id="zm-name" placeholder="напр. Холодильник"/></div>
       </div>
-      <button class="close-x" onclick="closeModals()">✕</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="zm-id" />
-      <div class="form-row" style="grid-template-columns:70px 1fr;">
-        <div class="fg"><label>Іконка</label><input type="text" id="zm-icon" placeholder="📦" maxlength="4" style="text-align:center;font-size:24px;" /></div>
-        <div class="fg"><label>Назва зони *</label><input type="text" id="zm-name" placeholder="напр. Холодильник м'ясний" /></div>
-      </div>
-      <div class="fg"><label>Температурний режим</label><input type="text" id="zm-temp" placeholder="напр. +2°C до +6°C" /></div>
-      <div class="fg"><label>Колір зони</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-          <button class="zone-color-btn" data-color="#2e6b9e" onclick="selectZoneColor(this)" style="width:32px;height:32px;border-radius:50%;background:#2e6b9e;border:2px solid transparent;cursor:pointer;" title="Синій"></button>
-          <button class="zone-color-btn" data-color="#5a7a5c" onclick="selectZoneColor(this)" style="width:32px;height:32px;border-radius:50%;background:#5a7a5c;border:2px solid transparent;cursor:pointer;" title="Зелений"></button>
-          <button class="zone-color-btn" data-color="#b8943a" onclick="selectZoneColor(this)" style="width:32px;height:32px;border-radius:50%;background:#b8943a;border:2px solid transparent;cursor:pointer;" title="Золотий"></button>
-          <button class="zone-color-btn" data-color="#c8702a" onclick="selectZoneColor(this)" style="width:32px;height:32px;border-radius:50%;background:#c8702a;border:2px solid transparent;cursor:pointer;" title="Помаранчевий"></button>
-          <button class="zone-color-btn" data-color="#c0392b" onclick="selectZoneColor(this)" style="width:32px;height:32px;border-radius:50%;background:#c0392b;border:2px solid transparent;cursor:pointer;" title="Червоний"></button>
-          <button class="zone-color-btn" data-color="#8e44ad" onclick="selectZoneColor(this)" style="width:32px;height:32px;border-radius:50%;background:#8e44ad;border:2px solid transparent;cursor:pointer;" title="Фіолетовий"></button>
-          <button class="zone-color-btn" data-color="#3d2b1a" onclick="selectZoneColor(this)" style="width:32px;height:32px;border-radius:50%;background:#3d2b1a;border:2px solid transparent;cursor:pointer;" title="Коричневий"></button>
-          <input type="hidden" id="zm-color" value="#2e6b9e" />
+      <div class="fg"><label>Температура</label><input type="text" id="zm-temp" placeholder="+2°C до +6°C"/></div>
+      <div class="fg"><label>Колір</label>
+        <div class="zcolors">
+          <button class="zcol" data-c="#2e6b9e" onclick="zc(this)" style="background:#2e6b9e;"></button>
+          <button class="zcol" data-c="#5a7a5c" onclick="zc(this)" style="background:#5a7a5c;"></button>
+          <button class="zcol" data-c="#b8943a" onclick="zc(this)" style="background:#b8943a;"></button>
+          <button class="zcol" data-c="#c8702a" onclick="zc(this)" style="background:#c8702a;"></button>
+          <button class="zcol" data-c="#c0392b" onclick="zc(this)" style="background:#c0392b;"></button>
+          <button class="zcol" data-c="#8e44ad" onclick="zc(this)" style="background:#8e44ad;"></button>
+          <button class="zcol" data-c="#3d2b1a" onclick="zc(this)" style="background:#3d2b1a;"></button>
+          <input type="hidden" id="zm-color" value="#2e6b9e"/>
         </div>
       </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModals()">Скасувати</button>
-      <button class="btn" onclick="saveZone()">Зберегти зону</button>
-    </div>
+    <div class="mft"><button class="btn ghost" onclick="cm()">Скасувати</button><button class="btn" onclick="saveZ()">Зберегти</button></div>
   </div>
 </div>
 
-<!-- ===== TELEGRAM SETTINGS ===== -->
-<div class="overlay" id="tg-settings-modal">
+<!-- TG SETTINGS -->
+<div class="ov" id="m-tgset">
   <div class="modal">
-    <div class="modal-head" style="background:#edf3f8;border-bottom:1px solid #c8d8e8;">
-      <div><h3 style="color:#2b5278;">⚙️ Налаштування Telegram</h3><p>Бот надсилатиме повідомлення у вказаний чат/групу</p></div>
-      <button class="close-x" onclick="closeModals()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="tg-settings-box">
-        <div class="fg"><label>Bot Token</label><input type="text" id="tg-token" placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ" /><div style="font-size:10px;color:#aaa;margin-top:4px;">Отримайте у @BotFather → /newbot</div></div>
-        <div class="fg" style="margin-bottom:0;"><label>Chat ID</label><input type="text" id="tg-chatid" placeholder="-1001234567890 або @назва_групи" /><div style="font-size:10px;color:#aaa;margin-top:4px;">Додайте бота до чату. ID через @userinfobot</div></div>
+    <div class="mhd" style="background:#edf3f8;border-bottom:1px solid #c8d8e8;"><div><h3 style="color:#2b5278;">⚙️ Telegram</h3></div><button class="xbtn" onclick="cm()">✕</button></div>
+    <div class="mbd">
+      <div class="tgbox">
+        <div class="fg"><label>Bot Token</label><input type="text" id="tg-tok" placeholder="..."/><div style="font-size:10px;color:#aaa;margin-top:3px;">@BotFather → /newbot</div></div>
+        <div class="fg" style="margin-bottom:0;"><label>Chat ID</label><input type="text" id="tg-cid" placeholder="-1001234567890"/></div>
       </div>
-      <div id="tg-test-result" style="display:none;padding:10px 14px;border-radius:6px;font-size:12px;font-weight:600;margin-bottom:12px;"></div>
+      <div id="tg-tres" style="display:none;padding:9px;border-radius:6px;font-size:12px;font-weight:600;margin-bottom:10px;"></div>
     </div>
-    <div class="modal-foot" style="flex-wrap:wrap;gap:8px;">
-      <button class="btn btn-ghost" onclick="closeModals()">Закрити</button>
-      <button class="btn" style="background:#6a90b0;" onclick="testTelegram()">🔗 Тест</button>
-      <button class="btn" style="background:#2b5278;" onclick="saveTgSettings()">Зберегти</button>
+    <div class="mft" style="flex-wrap:wrap;gap:7px;">
+      <button class="btn ghost" onclick="cm()">Закрити</button>
+      <button class="btn" style="background:#6a90b0;" onclick="tgTest()">🔗 Тест</button>
+      <button class="btn" style="background:#2b5278;" onclick="tgSave()">Зберегти</button>
     </div>
   </div>
 </div>
 
-<!-- ===== TELEGRAM SEND ===== -->
-<div class="overlay" id="tg-send-modal">
-  <div class="modal modal-lg">
-    <div class="modal-head" style="background:#edf3f8;border-bottom:1px solid #c8d8e8;">
-      <div><h3 style="color:#2b5278;">📤 Відправити замовлення в Telegram</h3></div>
-      <button class="close-x" onclick="closeModals()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-        <span class="tg-badge urgent" id="tg-modal-red" style="font-size:12px;padding:5px 12px;"></span>
-        <span class="tg-badge soon" id="tg-modal-yellow" style="font-size:12px;padding:5px 12px;"></span>
+<!-- TG SEND -->
+<div class="ov" id="m-tgsend">
+  <div class="modal mlg">
+    <div class="mhd" style="background:#edf3f8;border-bottom:1px solid #c8d8e8;"><div><h3 style="color:#2b5278;">📤 Відправити в Telegram</h3></div><button class="xbtn" onclick="cm()">✕</button></div>
+    <div class="mbd">
+      <div style="display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap;">
+        <span class="tgch r" id="tgmr"></span>
+        <span class="tgch y" id="tgmy"></span>
       </div>
-      <div style="font-size:11px;font-weight:600;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Попередній перегляд:</div>
-      <div class="order-preview" id="tg-preview"></div>
-      <div id="tg-send-result" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;font-weight:600;margin-top:12px;"></div>
+      <div style="font-size:10px;font-weight:600;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;">Попередній перегляд:</div>
+      <div class="oprev" id="tgprev"></div>
+      <div id="tgsres" style="display:none;padding:9px;border-radius:6px;font-size:13px;font-weight:600;margin-top:10px;"></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModals()">Скасувати</button>
-      <button class="btn" style="background:#2b5278;" onclick="sendToTelegram()" id="btn-do-send">
-        <svg style="width:15px;height:15px;fill:currentColor;" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+    <div class="mft">
+      <button class="btn ghost" onclick="cm()">Скасувати</button>
+      <button class="btn" style="background:#2b5278;" onclick="tgSend()" id="btnsend">
+        <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
         Надіслати
       </button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ===== FIREBASE + APP LOGIC ===== -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getDatabase, ref, set, remove, onValue, push, update } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import{getDatabase,ref,set,remove,onValue,push,update}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
-// ===== CONFIG =====
-const firebaseConfig = {
-  apiKey: "AIzaSyA7hBzF8zx84X1kXcfTDvaWKWZBFQ-U0gk",
-  authDomain: "baranchik-checklist.firebaseapp.com",
-  databaseURL: "https://baranchik-checklist-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "baranchik-checklist",
-  storageBucket: "baranchik-checklist.firebasestorage.app",
-  messagingSenderId: "374378353806",
-  appId: "1:374378353806:web:d3cdfca5e89fc80eece5df"
-};
+const app=initializeApp({apiKey:"AIzaSyA7hBzF8zx84X1kXcfTDvaWKWZBFQ-U0gk",authDomain:"baranchik-checklist.firebaseapp.com",databaseURL:"https://baranchik-checklist-default-rtdb.europe-west1.firebasedatabase.app",projectId:"baranchik-checklist",storageBucket:"baranchik-checklist.firebasestorage.app",messagingSenderId:"374378353806",appId:"1:374378353806:web:d3cdfca5e89fc80eece5df"});
+const db=getDatabase(app);
+const iRef=ref(db,'storage/items'),zRef=ref(db,'storage/zones'),sRef=ref(db,'storage/settings');
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const itemsRef = ref(db, 'storage/items');
-const zonesRef = ref(db, 'storage/zones');
-const settingsRef = ref(db, 'storage/settings');
+let items=[],zones={},curZ='all',sF='name',sD=1,aF=new Set(),mF=null,adjT=null,zL=false,iL=false;
+let tok='7906609865:AAGxiiMSSnJcShk5SoxE7eVItyqDcWvyE38',cid='-1002336484919';
 
-// ===== STATE =====
-let items = [];
-let zones = {};       // { fbKey: { name, icon, temp, color } }
-let curZone = 'all';
-let sortF = 'name', sortD = 1;
-let activeFilters = new Set();
-let markerFilter = null;  // null | 'green' | 'yellow' | 'red'
-let adjTarget = null;
-let zonesLoaded = false;
-let itemsLoaded = false;
-let tgToken = '', tgChatId = '';
+// CLOCK
+function tick(){const n=new Date(),cl=document.getElementById('clock');if(cl)cl.textContent=n.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});}
+setInterval(tick,1000);tick();
 
-// ===== CLOCK =====
-function tick() {
-  const n = new Date();
-  const cl = document.getElementById('clock');
-  const dd = document.getElementById('date-disp');
-  if (cl) cl.textContent = n.toLocaleTimeString('uk-UA');
-  if (dd) dd.textContent = n.toLocaleDateString('uk-UA', { weekday:'long', day:'2-digit', month:'long' });
-}
-setInterval(tick, 1000); tick();
+// SYNC DOT
+function ss(s){const d=document.getElementById('sdot');if(!d)return;d.className=s;}
 
-// ===== SYNC STATUS =====
-function setStatus(state) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  if (!dot) return;
-  const map = { online:{bg:'#5a7a5c',text:'● Синхронізовано'}, connecting:{bg:'#b8943a',text:'◌ Підключення...'}, offline:{bg:'#c0392b',text:'✕ Немає з\'єднання'} };
-  const s = map[state] || map.offline;
-  dot.style.background = s.bg;
-  if (lbl) lbl.textContent = s.text;
-}
-setStatus('connecting');
+ss('con');
 
-// ===== SETTINGS LISTENER =====
-onValue(settingsRef, snap => {
-  const s = snap.val();
-  // Якщо в Firebase немає налаштувань — використовуємо вбудовані
-  tgToken  = (s && s.tgToken)  ? s.tgToken  : '7906609865:AAGxiiMSSnJcShk5SoxE7eVItyqDcWvyE38';
-  tgChatId = (s && s.tgChatId) ? s.tgChatId : '-1002336484919';
-  // Зберегти дефолти у Firebase якщо їх ще немає
-  if (!s || !s.tgToken) {
-    set(settingsRef, { tgToken, tgChatId }).catch(() => {});
-  }
-}, { onlyOnce: true });
+onValue(sRef,snap=>{const s=snap.val();tok=(s&&s.tgToken)?s.tgToken:'7906609865:AAGxiiMSSnJcShk5SoxE7eVItyqDcWvyE38';cid=(s&&s.tgChatId)?s.tgChatId:'-1002336484919';if(!s||!s.tgToken)set(sRef,{tgToken:tok,tgChatId:cid}).catch(()=>{});},{onlyOnce:true});
 
-// ===== ZONES LISTENER =====
-onValue(zonesRef, snap => {
-  const data = snap.val();
-  if (data) {
-    zones = data;
-  } else {
-    seedDefaultZones();
-    return;
-  }
-  zonesLoaded = true;
-  renderZoneTabs();
-  renderZoneOverview();
-  populateZoneSelects();
-  if (itemsLoaded) renderAll();
-});
+onValue(zRef,snap=>{const d=snap.val();if(d){zones=d;}else{seedZ();return;}zL=true;rzTabs();rzOv();fillZS();if(iL)ra();});
 
-function seedDefaultZones() {
-  const defaults = [
-    { name:'Холодильник заготівельний + морозилка', icon:'❄️', temp:'+2°C до +6°C', color:'#2e6b9e' },
-    { name:'Холодильник зелень', icon:'🌿', temp:'+2°C до +6°C', color:'#5a7a5c' },
-    { name:'Сухий склад', icon:'📦', temp:'+15°C до +20°C', color:'#b8943a' },
-  ];
-  defaults.forEach(z => push(zonesRef, z));
+function seedZ(){[{name:'Холодильник заготівельний',icon:'❄️',temp:'+2°C до +6°C',color:'#2e6b9e'},{name:'Холодильник зелень',icon:'🌿',temp:'+2°C до +6°C',color:'#5a7a5c'},{name:'Сухий склад',icon:'📦',temp:'+15°C до +20°C',color:'#b8943a'}].forEach(z=>push(zRef,z));}
+
+onValue(iRef,snap=>{const d=snap.val();items=d?Object.entries(d).map(([k,v])=>({...v,fbKey:k})):[];if(!iL&&!items.length&&zL)seedI();iL=true;ss('ok');ra();},()=>ss('err'));
+
+function seedI(){
+  const dry=Object.values(zones).find(z=>z.name.includes('Сухий'))?.name||Object.values(zones)[0]?.name||'Сухий склад';
+  const t=new Date().toLocaleDateString('uk-UA');
+  [{name:'Зіра',category:'Спеції та приправи',zone:dry,unit:'кг',qty:1,minQty:1,expiry:'',note:'',addedAt:t,marker:'yellow',orderQty:'2'},
+   {name:'Коріандр',category:'Спеції та приправи',zone:dry,unit:'кг',qty:0.2,minQty:1,expiry:'',note:'',addedAt:t,marker:'red',orderQty:'3'},
+   {name:'Соус соєвий',category:'Спеції та приправи',zone:dry,unit:'л',qty:2,minQty:1,expiry:'',note:'',addedAt:t,marker:'green',orderQty:''},
+   {name:'Перець чорний',category:'Спеції та приправи',zone:dry,unit:'кг',qty:0,minQty:1,expiry:'',note:'',addedAt:t,marker:'red',orderQty:'2'},
+   {name:'Вегета',category:'Спеції та приправи',zone:dry,unit:'кг',qty:1.5,minQty:0.5,expiry:'',note:'',addedAt:t,marker:'green',orderQty:''}
+  ].forEach(it=>push(iRef,it));
 }
 
-// ===== ITEMS LISTENER =====
-onValue(itemsRef, snap => {
-  const data = snap.val();
-  items = data ? Object.entries(data).map(([fbKey, val]) => ({ ...val, fbKey })) : [];
-  if (!itemsLoaded && items.length === 0 && zonesLoaded) seedSampleData();
-  itemsLoaded = true;
-  setStatus('online');
-  renderAll();
-}, () => setStatus('offline'));
+function e(s){return String(s).replace(/'/g,'&#39;');}
+function dL(x){if(!x)return null;return Math.ceil((new Date(x)-new Date())/86400000);}
+function eS(x){const d=dL(x);if(d===null)return null;return d<0?'exp':d<=3?'soon':'ok';}
 
-// ===== SEED SAMPLE DATA =====
-function seedSampleData() {
-  const today = new Date().toLocaleDateString('uk-UA');
-  const zoneNames = Object.values(zones).map(z => z.name);
-  const dryZone = zoneNames.find(n => n.includes('Сухий') || n.includes('склад')) || zoneNames[0] || 'Сухий склад';
-  const samples = [
-    { name:'Барбарис в\'ялений', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:2, minQty:1, expiry:'2026-03-31', supplier:'', note:'', addedAt:today, marker:null, orderQty:'' },
-    { name:'Вегета', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:1, minQty:0.5, expiry:'', supplier:'', note:'', addedAt:today, marker:'green', orderQty:'' },
-    { name:'Зіра', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:1, minQty:1, expiry:'', supplier:'', note:'', addedAt:today, marker:'yellow', orderQty:'2' },
-    { name:'Коріандр', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:0.2, minQty:1, expiry:'', supplier:'', note:'', addedAt:today, marker:'red', orderQty:'3' },
-    { name:'Кунжут', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:0.5, minQty:0.5, expiry:'', supplier:'', note:'', addedAt:today, marker:null, orderQty:'' },
-    { name:'Соус соєвий', category:'Спеції та приправи', zone:dryZone, unit:'л', qty:2, minQty:1, expiry:'', supplier:'', note:'', addedAt:today, marker:'green', orderQty:'' },
-    { name:'Перець чорний мелений', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:0, minQty:1, expiry:'', supplier:'', note:'', addedAt:today, marker:'red', orderQty:'2' },
-    { name:'Спеція для риби', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:0.15, minQty:0.2, expiry:'', supplier:'', note:'', addedAt:today, marker:'yellow', orderQty:'0.5' },
-    { name:'Хмелі', category:'Спеції та приправи', zone:dryZone, unit:'кг', qty:2, minQty:1, expiry:'2026-03-31', supplier:'', note:'', addedAt:today, marker:'green', orderQty:'' },
-  ];
-  samples.forEach(item => push(itemsRef, item));
+function rzTabs(){
+  const el=document.getElementById('ztabs');if(!el)return;
+  let h=`<button class="ztab ${curZ==='all'?'on':''}" data-z="all" onclick="setZ(this)">Всі</button>`;
+  Object.values(zones).forEach(z=>{h+=`<button class="ztab ${curZ===z.name?'on':''}" data-z="${e(z.name)}" onclick="setZ(this)">${z.icon||'📦'} ${z.name}</button>`;});
+  el.innerHTML=h;
 }
 
-// ===== EXPIRY HELPERS =====
-function daysLeft(expStr) {
-  if (!expStr) return null;
-  return Math.ceil((new Date(expStr) - new Date()) / 86400000);
-}
-function expiryStatus(expStr) {
-  const d = daysLeft(expStr);
-  if (d === null) return null;
-  if (d < 0) return 'expired';
-  if (d <= 3) return 'soon';
-  return 'ok';
+function fillZS(){
+  const l=Object.values(zones);
+  ['a-zone','e-zone'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const c=s.value;s.innerHTML=l.map(z=>`<option value="${e(z.name)}">${z.icon||'📦'} ${z.name}</option>`).join('');if(c&&l.some(z=>z.name===c))s.value=c;});
 }
 
-// ===== ZONE TABS =====
-function renderZoneTabs() {
-  const tabsEl = document.getElementById('zone-tabs');
-  if (!tabsEl) return;
-  const zoneList = Object.values(zones);
-  let html = `<button class="ztab ${curZone==='all'?'active':''}" data-z="all" onclick="setZone(this)">Всі зони</button>`;
-  zoneList.forEach(z => {
-    const isActive = curZone === z.name;
-    html += `<button class="ztab ${isActive?'active':''}" data-z="${esc(z.name)}" onclick="setZone(this)">${z.icon || '📦'} ${z.name}</button>`;
-  });
-  tabsEl.innerHTML = html;
-}
-
-function esc(str) { return String(str).replace(/'/g,'&#39;'); }
-
-// ===== ZONE SELECTS =====
-function populateZoneSelects() {
-  const zoneList = Object.values(zones);
-  ['a-zone','e-zone'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    const cur = sel.value;
-    sel.innerHTML = zoneList.map(z => `<option value="${esc(z.name)}">${z.icon||'📦'} ${z.name}</option>`).join('');
-    if (cur && zoneList.some(z => z.name === cur)) sel.value = cur;
-  });
-}
-
-// ===== ZONE OVERVIEW =====
-function renderZoneOverview() {
-  const box = document.getElementById('zone-overview');
-  if (!box) return;
-  const zoneList = Object.entries(zones);
-  if (!zoneList.length) { box.innerHTML = '<div style="text-align:center;padding:20px;color:#ccc;font-size:12px;">Зони ще не додані</div>'; return; }
-  box.innerHTML = zoneList.map(([zKey, z]) => {
-    const zItems = items.filter(i => i.zone === z.name);
-    const low = zItems.filter(i => i.minQty > 0 && i.qty < i.minQty && i.qty > 0).length;
-    const empty = zItems.filter(i => i.qty === 0).length;
-    const redMarked = zItems.filter(i => i.marker === 'red').length;
-    const yellowMarked = zItems.filter(i => i.marker === 'yellow').length;
-    const color = z.color || '#3d2b1a';
-    return `<div class="zone-card">
-      <div class="zone-card-header" onclick="filterByZone('${esc(z.name)}')">
-        <span style="font-size:22px;">${z.icon||'📦'}</span>
-        <div style="flex:1;min-width:0;">
-          <div class="zone-card-title" style="color:${color};">${z.name}</div>
-          <div class="zone-card-temp">${z.temp||''}</div>
-        </div>
-        <div style="text-align:right;margin-right:6px;">
-          <div class="zone-card-count">${zItems.length}</div>
-          <div style="font-size:10px;color:#aaa;">позицій</div>
-        </div>
-        <div class="zone-card-labels">
-          ${redMarked?`<span class="zone-mini-badge" style="background:#fde8e8;color:#c0392b;">🔴 ${redMarked}</span>`:''}
-          ${yellowMarked?`<span class="zone-mini-badge" style="background:#fef5e0;color:#b8943a;">🟡 ${yellowMarked}</span>`:''}
-          ${low?`<span class="zone-mini-badge" style="background:#fef5e0;color:#b8943a;">⚠ ${low}</span>`:''}
-          ${empty?`<span class="zone-mini-badge" style="background:#fde8e8;color:#c0392b;">✕ ${empty}</span>`:''}
-        </div>
-      </div>
-      <div class="zone-card-actions">
-        <button class="zone-action-btn" onclick="printZone('${esc(z.name)}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
-          Друк
-        </button>
-        <button class="zone-action-btn" onclick="openZoneModal('${esc(zKey)}')">✏️ Ред.</button>
-        <button class="zone-action-btn danger" onclick="deleteZone('${esc(zKey)}','${esc(z.name)}')">✕ Вид.</button>
-      </div>
-    </div>`;
+function rzOv(){
+  const b=document.getElementById('zov');if(!b)return;
+  const zl=Object.entries(zones);
+  if(!zl.length){b.innerHTML='<div style="text-align:center;padding:12px;color:#ccc;font-size:12px;">Немає зон</div>';return;}
+  b.innerHTML=zl.map(([zk,z])=>{
+    const zi=items.filter(i=>i.zone===z.name);
+    const rc=zi.filter(i=>i.marker==='red').length,yc=zi.filter(i=>i.marker==='yellow').length,ec=zi.filter(i=>i.qty===0).length;
+    const col=z.color||'#3d2b1a';
+    return `<div class="zcard"><div class="zchd" onclick="fByZ('${e(z.name)}')">
+      <span style="font-size:18px;">${z.icon||'📦'}</span>
+      <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;color:${col};">${z.name}</div>${z.temp?`<div style="font-size:10px;color:#bbb;">${z.temp}</div>`:''}</div>
+      <div style="text-align:right;margin-right:4px;"><div class="zcnt">${zi.length}</div><div style="font-size:9px;color:#bbb;">позицій</div></div>
+      <div class="zcbs">${rc?`<span class="zcb" style="background:#fde8e8;color:#c0392b;">🔴${rc}</span>`:''}${yc?`<span class="zcb" style="background:#fef5e0;color:#b8943a;">🟡${yc}</span>`:''}${ec?`<span class="zcb" style="background:#fde8e8;color:#c0392b;">✕${ec}</span>`:''}</div>
+    </div><div class="zcft">
+      <button class="zcfb" onclick="openZM('${e(zk)}')">✏️ Ред.</button>
+      <button class="zcfb" onclick="printZone('${e(z.name)}')">🖨️</button>
+      <button class="zcfb del" onclick="delZ('${e(zk)}','${e(z.name)}')">✕</button>
+    </div></div>`;
   }).join('');
 }
 
-// ===== ZONE CRUD =====
-window.openZoneModal = function(zKey) {
-  const modal = document.getElementById('zone-modal');
-  document.getElementById('zm-id').value = zKey || '';
-  if (zKey && zones[zKey]) {
-    const z = zones[zKey];
-    document.getElementById('zone-modal-title').textContent = '✏️ Редагувати зону';
-    document.getElementById('zone-modal-sub').textContent = z.name;
-    document.getElementById('zm-icon').value = z.icon || '📦';
-    document.getElementById('zm-name').value = z.name;
-    document.getElementById('zm-temp').value = z.temp || '';
-    document.getElementById('zm-color').value = z.color || '#2e6b9e';
-    document.querySelectorAll('.zone-color-btn').forEach(b => b.style.border = b.dataset.color === (z.color||'#2e6b9e') ? '3px solid var(--ink)' : '2px solid transparent');
-  } else {
-    document.getElementById('zone-modal-title').textContent = '➕ Нова зона зберігання';
-    document.getElementById('zone-modal-sub').textContent = 'Заповніть інформацію про зону';
-    document.getElementById('zm-icon').value = '📦';
-    document.getElementById('zm-name').value = '';
-    document.getElementById('zm-temp').value = '';
-    document.getElementById('zm-color').value = '#2e6b9e';
-    document.querySelectorAll('.zone-color-btn').forEach(b => b.style.border = b.dataset.color === '#2e6b9e' ? '3px solid var(--ink)' : '2px solid transparent');
-  }
-  modal.classList.add('open');
+window.openZM=function(zk){
+  document.getElementById('zm-id').value=zk||'';
+  if(zk&&zones[zk]){const z=zones[zk];document.getElementById('zm-title').textContent='✏️ Редагувати зону';document.getElementById('zm-icon').value=z.icon||'📦';document.getElementById('zm-name').value=z.name;document.getElementById('zm-temp').value=z.temp||'';document.getElementById('zm-color').value=z.color||'#2e6b9e';document.querySelectorAll('.zcol').forEach(b=>b.style.border=b.dataset.c===(z.color||'#2e6b9e')?'3px solid #333':'2px solid transparent');}
+  else{document.getElementById('zm-title').textContent='➕ Нова зона';['zm-icon','zm-name','zm-temp'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=id==='zm-icon'?'📦':'';});document.getElementById('zm-color').value='#2e6b9e';document.querySelectorAll('.zcol').forEach(b=>b.style.border=b.dataset.c==='#2e6b9e'?'3px solid #333':'2px solid transparent');}
+  document.getElementById('m-zone').classList.add('on');
+};
+window.zc=function(b){document.getElementById('zm-color').value=b.dataset.c;document.querySelectorAll('.zcol').forEach(x=>x.style.border='2px solid transparent');b.style.border='3px solid #333';};
+window.saveZ=function(){
+  const nm=document.getElementById('zm-name').value.trim();if(!nm){toast('Введіть назву!','err');return;}
+  const zd={name:nm,icon:document.getElementById('zm-icon').value.trim()||'📦',temp:document.getElementById('zm-temp').value.trim(),color:document.getElementById('zm-color').value||'#2e6b9e'};
+  const zk=document.getElementById('zm-id').value,isE=!!zk,old=isE&&zones[zk]?zones[zk].name:null;
+  (isE?update(ref(db,'storage/zones/'+zk),zd):push(zRef,zd)).then(()=>{if(isE&&old&&old!==nm)items.filter(i=>i.zone===old).forEach(i=>update(ref(db,'storage/items/'+i.fbKey),{zone:nm}));cm();toast((isE?'✓ Зону оновлено':'✓ Зону додано'),'ok');}).catch(er=>toast('Помилка: '+er.message,'err'));
+};
+window.delZ=function(zk,zn){if(!confirm(items.filter(i=>i.zone===zn).length>0?`Видалити "${zn}"? В зоні є продукти.`:`Видалити "${zn}"?`))return;remove(ref(db,'storage/zones/'+zk)).then(()=>toast('Зону видалено')).catch(er=>toast('Помилка: '+er.message,'err'));};
+
+window.setMark=function(k,c){const it=items.find(i=>i.fbKey===k);if(!it)return;update(ref(db,'storage/items/'+k),{marker:it.marker===c?null:c}).catch(er=>toast('Помилка: '+er.message,'err'));};
+
+window.stepQ=function(k,d){
+  const it=items.find(i=>i.fbKey===k);if(!it)return;
+  const step=(it.unit==='г'||it.unit==='мл')?50:(it.unit==='шт'||it.unit==='пляш'||it.unit==='упак'||it.unit==='пач')?1:0.5;
+  const cur=parseFloat(it.orderQty)||0;
+  const nv=Math.max(0,Math.round((cur+d*step)*100)/100);
+  update(ref(db,'storage/items/'+k),{orderQty:nv||''}).catch(er=>toast('Помилка: '+er.message,'err'));
+};
+window.setOQ=function(k,v){const n=parseFloat(v);update(ref(db,'storage/items/'+k),{orderQty:(!isNaN(n)&&n>0)?n:''}).catch(er=>toast('Помилка: '+er.message,'err'));};
+
+window.startQE=function(k){
+  const it=items.find(i=>i.fbKey===k);if(!it)return;
+  const c=document.getElementById('qc-'+k);if(!c)return;
+  c.innerHTML=`<div class="qedit"><input id="qi-${k}" type="number" value="${it.qty}" min="0" step="0.1" onkeydown="qK(event,'${k}')"/><button class="qok" onclick="qOK('${k}')">✓</button><button class="qx" onclick="rt()">✕</button></div>`;
+  const inp=document.getElementById('qi-'+k);if(inp){inp.focus();inp.select();}
+};
+window.qOK=function(k){const inp=document.getElementById('qi-'+k);if(!inp)return;const v=parseFloat(inp.value);if(isNaN(v)||v<0){toast('Невірне!','err');return;}const it=items.find(i=>i.fbKey===k);update(ref(db,'storage/items/'+k),{qty:v}).then(()=>toast(`✓ ${it.name}: ${v} ${it.unit}`,'ok')).catch(er=>toast('Помилка: '+er.message,'err'));};
+window.qK=function(ev,k){if(ev.key==='Enter')qOK(k);if(ev.key==='Escape')rt();};
+
+window.openAdd=function(){fillZS();document.getElementById('m-add').classList.add('on');};
+window.addIt=function(){
+  const nm=document.getElementById('a-name').value.trim(),qty=parseFloat(document.getElementById('a-qty').value);
+  if(!nm){toast('Введіть назву!','err');return;}if(isNaN(qty)){toast('Введіть кількість!','err');return;}
+  push(iRef,{name:nm,category:document.getElementById('a-cat').value,zone:document.getElementById('a-zone').value,unit:document.getElementById('a-unit').value,qty,minQty:parseFloat(document.getElementById('a-min').value)||0,expiry:document.getElementById('a-exp').value||'',note:document.getElementById('a-note').value.trim()||'',addedAt:new Date().toLocaleDateString('uk-UA'),marker:null,orderQty:''}).then(()=>{cm();toast('✓ "'+nm+'" додано','ok');['a-name','a-qty','a-min','a-exp','a-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}).catch(er=>toast('Помилка: '+er.message,'err'));
 };
 
-window.selectZoneColor = function(btn) {
-  document.getElementById('zm-color').value = btn.dataset.color;
-  document.querySelectorAll('.zone-color-btn').forEach(b => b.style.border = '2px solid transparent');
-  btn.style.border = '3px solid var(--ink)';
+window.openEd=function(k){
+  const it=items.find(i=>i.fbKey===k);if(!it)return;fillZS();
+  document.getElementById('e-id').value=k;document.getElementById('e-name').value=it.name;document.getElementById('e-cat').value=it.category||'';document.getElementById('e-zone').value=it.zone;document.getElementById('e-unit').value=it.unit;document.getElementById('e-qty').value=it.qty;document.getElementById('e-min').value=it.minQty||0;document.getElementById('e-exp').value=it.expiry||'';document.getElementById('e-sup').value=it.supplier||'';document.getElementById('e-sku').value=it.sku||'';document.getElementById('e-note').value=it.note||'';
+  document.getElementById('m-edit').classList.add('on');
+};
+window.delCur=function(){const k=document.getElementById('e-id').value;const it=items.find(i=>i.fbKey===k);if(!it||!confirm(`Видалити "${it.name}"?`))return;remove(ref(db,'storage/items/'+k)).then(()=>{cm();toast('Видалено');}).catch(er=>toast('Помилка: '+er.message,'err'));};
+window.saveEd=function(){
+  const k=document.getElementById('e-id').value,it=items.find(i=>i.fbKey===k);if(!it)return;
+  update(ref(db,'storage/items/'+k),{name:document.getElementById('e-name').value.trim()||it.name,category:document.getElementById('e-cat').value,zone:document.getElementById('e-zone').value,unit:document.getElementById('e-unit').value,qty:parseFloat(document.getElementById('e-qty').value)||0,minQty:parseFloat(document.getElementById('e-min').value)||0,expiry:document.getElementById('e-exp').value||'',supplier:document.getElementById('e-sup').value.trim(),sku:document.getElementById('e-sku').value.trim(),note:document.getElementById('e-note').value.trim(),addedAt:it.addedAt}).then(()=>{cm();toast('✓ Збережено','ok');}).catch(er=>toast('Помилка: '+er.message,'err'));
 };
 
-window.saveZone = function() {
-  const name = document.getElementById('zm-name').value.trim();
-  if (!name) { showToast('Введіть назву зони!', 'err'); return; }
-  const zData = {
-    name,
-    icon: document.getElementById('zm-icon').value.trim() || '📦',
-    temp: document.getElementById('zm-temp').value.trim(),
-    color: document.getElementById('zm-color').value || '#2e6b9e'
-  };
-  const zKey = document.getElementById('zm-id').value;
-  const isEdit = !!zKey;
-  const oldName = isEdit && zones[zKey] ? zones[zKey].name : null;
-  const op = isEdit ? update(ref(db, 'storage/zones/' + zKey), zData) : push(zonesRef, zData);
-  op.then(() => {
-    // If renaming a zone, update all items in that zone
-    if (isEdit && oldName && oldName !== name) {
-      const toUpdate = items.filter(i => i.zone === oldName);
-      toUpdate.forEach(i => update(ref(db, 'storage/items/' + i.fbKey), { zone: name }));
-    }
-    closeModals();
-    showToast(isEdit ? `✓ Зону "${name}" оновлено` : `✓ Зону "${name}" додано`, 'ok');
-  }).catch(e => showToast('Помилка: ' + e.message, 'err'));
+window.sAdj=function(){
+  const q=document.getElementById('adj-q').value.toLowerCase().trim(),b=document.getElementById('adj-sug');
+  if(!q){b.innerHTML='';adjT=null;return;}
+  const m=items.filter(i=>i.name.toLowerCase().includes(q)).slice(0,6);
+  b.innerHTML=m.length?`<div class="adjdrop">${m.map(it=>`<div class="adji" onclick="selAdj('${it.fbKey}')">${it.name} <span style="color:#bbb;font-size:11px;">${it.qty} ${it.unit}</span></div>`).join('')}</div>`:'';
+};
+window.selAdj=function(k){adjT=k;const it=items.find(i=>i.fbKey===k);document.getElementById('adj-q').value=it.name;document.getElementById('adj-sug').innerHTML='';};
+window.doAdj=function(){
+  if(!adjT){toast('Оберіть продукт!','err');return;}
+  const v=parseFloat(document.getElementById('adj-val').value);if(isNaN(v)||v<0){toast('Введіть кількість!','err');return;}
+  const op=document.getElementById('adj-op').value,it=items.find(i=>i.fbKey===adjT);
+  const nq=op==='add'?Math.round((it.qty+v)*100)/100:op==='sub'?Math.max(0,Math.round((it.qty-v)*100)/100):v;
+  update(ref(db,'storage/items/'+adjT),{qty:nq}).then(()=>{toast(`✓ ${it.name}: ${it.qty}→${nq} ${it.unit}`,'ok');document.getElementById('adj-q').value='';document.getElementById('adj-val').value='';adjT=null;}).catch(er=>toast('Помилка: '+er.message,'err'));
 };
 
-window.deleteZone = function(zKey, zName) {
-  const count = items.filter(i => i.zone === zName).length;
-  const msg = count > 0
-    ? `Видалити зону "${zName}"?\n⚠️ В цій зоні є ${count} продуктів — вони залишаться без зони.`
-    : `Видалити зону "${zName}"?`;
-  if (!confirm(msg)) return;
-  remove(ref(db, 'storage/zones/' + zKey))
-    .then(() => showToast(`Зону "${zName}" видалено`))
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
+window.setZ=function(el){document.querySelectorAll('.ztab').forEach(t=>t.classList.remove('on'));el.classList.add('on');curZ=el.dataset.z;rt();};
+window.fByZ=function(z){curZ=z;document.querySelectorAll('.ztab').forEach(t=>t.classList.toggle('on',t.dataset.z===z));rt();};
+window.mf=function(c){mF=mF===c?null:c;['g','y','r'].forEach(x=>{const b=document.getElementById('fp-'+x);if(b)b.className='pill';});if(mF){const b=document.getElementById('fp-'+c[0]);const cl=c==='green'?'pg':c==='yellow'?'py':'pr';if(b)b.className='pill '+cl;}rt();};
+window.tf=function(el,f){if(aF.has(f)){aF.delete(f);el.className='pill';}else{aF.add(f);el.className='pill '+(f==='empty'?'pr':'py');}rt();};
+window.sb=function(f){if(sF===f)sD*=-1;else{sF=f;sD=1;}rt();};
 
-// ===== MARKER =====
-window.setMarker = function(fbKey, color) {
-  const item = items.find(i => i.fbKey === fbKey);
-  if (!item) return;
-  const newMarker = item.marker === color ? null : color;
-  update(ref(db, 'storage/items/' + fbKey), { marker: newMarker || null })
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
-
-// ===== ORDER QTY =====
-window.setOrderQty = function(fbKey, val) {
-  update(ref(db, 'storage/items/' + fbKey), { orderQty: val })
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
-
-// ===== INLINE QTY EDIT =====
-window.startQtyEdit = function(fbKey) {
-  const it = items.find(i => i.fbKey === fbKey);
-  if (!it) return;
-  const cell = document.getElementById('qty-cell-' + fbKey);
-  if (!cell) return;
-  cell.innerHTML = `<div class="qty-inline-form">
-    <input class="qty-inline-input" id="qty-inp-${fbKey}" type="number" value="${it.qty}" min="0" step="0.1"
-      onkeydown="qtyKeyDown(event,'${fbKey}')" autofocus />
-    <button class="qty-confirm-btn" onclick="confirmQtyEdit('${fbKey}')">✓</button>
-    <button class="qty-cancel-btn" onclick="cancelQtyEdit('${fbKey}')">✕</button>
-  </div>`;
-  const inp = document.getElementById('qty-inp-' + fbKey);
-  if (inp) { inp.focus(); inp.select(); }
-};
-
-window.confirmQtyEdit = function(fbKey) {
-  const inp = document.getElementById('qty-inp-' + fbKey);
-  if (!inp) return;
-  const val = parseFloat(inp.value);
-  if (isNaN(val) || val < 0) { showToast('Невірне значення!', 'err'); return; }
-  const it = items.find(i => i.fbKey === fbKey);
-  update(ref(db, 'storage/items/' + fbKey), { qty: val })
-    .then(() => showToast(`✓ ${it.name}: ${it.qty} → ${val} ${it.unit}`, 'ok'))
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
-
-window.cancelQtyEdit = function(fbKey) {
-  renderTable();
-};
-
-window.qtyKeyDown = function(e, fbKey) {
-  if (e.key === 'Enter') confirmQtyEdit(fbKey);
-  if (e.key === 'Escape') cancelQtyEdit(fbKey);
-};
-
-// ===== ADD ITEM =====
-window.openAddModal = function() {
-  populateZoneSelects();
-  document.getElementById('add-modal').classList.add('open');
-};
-
-window.addItem = function() {
-  const name = document.getElementById('a-name').value.trim();
-  const qty = parseFloat(document.getElementById('a-qty').value);
-  if (!name) { showToast('Введіть назву продукту!', 'err'); return; }
-  if (isNaN(qty)) { showToast('Введіть кількість!', 'err'); return; }
-  const newItem = {
-    name, sku: document.getElementById('a-sku').value.trim() || '',
-    category: document.getElementById('a-cat').value,
-    zone: document.getElementById('a-zone').value,
-    unit: document.getElementById('a-unit').value, qty,
-    minQty: parseFloat(document.getElementById('a-min').value) || 0,
-    expiry: document.getElementById('a-exp').value || '',
-    supplier: document.getElementById('a-sup').value.trim() || '',
-    note: document.getElementById('a-note').value.trim() || '',
-    addedAt: new Date().toLocaleDateString('uk-UA'),
-    marker: null, orderQty: ''
-  };
-  push(itemsRef, newItem)
-    .then(() => {
-      closeModals();
-      showToast(`✓ "${name}" додано`, 'ok');
-      ['a-name','a-sku','a-qty','a-min','a-exp','a-sup','a-note'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-    })
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
-
-// ===== EDIT ITEM =====
-window.openEdit = function(fbKey) {
-  const it = items.find(i => i.fbKey === fbKey);
-  if (!it) return;
-  populateZoneSelects();
-  document.getElementById('e-id').value = fbKey;
-  document.getElementById('e-name').value = it.name;
-  document.getElementById('e-sku').value = it.sku || '';
-  document.getElementById('e-cat').value = it.category || '';
-  document.getElementById('e-zone').value = it.zone;
-  document.getElementById('e-unit').value = it.unit;
-  document.getElementById('e-qty').value = it.qty;
-  document.getElementById('e-min').value = it.minQty || 0;
-  document.getElementById('e-exp').value = it.expiry || '';
-  document.getElementById('e-sup').value = it.supplier || '';
-  document.getElementById('e-note').value = it.note || '';
-  document.getElementById('edit-modal').classList.add('open');
-};
-
-window.deleteCurrentItem = function() {
-  const fbKey = document.getElementById('e-id').value;
-  deleteItem(fbKey);
-};
-
-window.saveEdit = function() {
-  const fbKey = document.getElementById('e-id').value;
-  const it = items.find(i => i.fbKey === fbKey);
-  if (!it) return;
-  const updated = {
-    name: document.getElementById('e-name').value.trim() || it.name,
-    sku: document.getElementById('e-sku').value.trim(),
-    category: document.getElementById('e-cat').value,
-    zone: document.getElementById('e-zone').value,
-    unit: document.getElementById('e-unit').value,
-    qty: parseFloat(document.getElementById('e-qty').value) || 0,
-    minQty: parseFloat(document.getElementById('e-min').value) || 0,
-    expiry: document.getElementById('e-exp').value || '',
-    supplier: document.getElementById('e-sup').value.trim(),
-    note: document.getElementById('e-note').value.trim(),
-    addedAt: it.addedAt
-  };
-  update(ref(db, 'storage/items/' + fbKey), updated)
-    .then(() => { closeModals(); showToast(`✓ "${updated.name}" оновлено`, 'ok'); })
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
-
-// ===== DELETE =====
-window.deleteItem = function(fbKey) {
-  const it = items.find(i => i.fbKey === fbKey);
-  if (!it) return;
-  if (!confirm(`Видалити "${it.name}"?`)) return;
-  remove(ref(db, 'storage/items/' + fbKey))
-    .then(() => { closeModals(); showToast(`Видалено: ${it.name}`); })
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
-
-// ===== QUICK ADJUST =====
-window.suggestAdj = function() {
-  const q = document.getElementById('adj-q').value.toLowerCase().trim();
-  const box = document.getElementById('adj-suggestions');
-  if (!q) { box.innerHTML = ''; adjTarget = null; return; }
-  const matches = items.filter(i => i.name.toLowerCase().includes(q) || (i.sku||'').toLowerCase().includes(q)).slice(0,6);
-  if (!matches.length) { box.innerHTML = ''; return; }
-  box.innerHTML = `<div class="adj-suggestions-dropdown">${
-    matches.map(it => `<div class="adj-suggestion-item" onclick="selectAdj('${it.fbKey}')">
-      ${it.name} <span style="color:#aaa;font-size:11px;">(${it.qty} ${it.unit}) · ${it.zone}</span>
-    </div>`).join('')
-  }</div>`;
-};
-
-window.selectAdj = function(fbKey) {
-  adjTarget = fbKey;
-  const it = items.find(i => i.fbKey === fbKey);
-  document.getElementById('adj-q').value = it.name;
-  document.getElementById('adj-suggestions').innerHTML = '';
-};
-
-window.doAdjust = function() {
-  if (!adjTarget) { showToast('Оберіть продукт зі списку!', 'err'); return; }
-  const val = parseFloat(document.getElementById('adj-val').value);
-  if (isNaN(val) || val < 0) { showToast('Введіть коректну кількість!', 'err'); return; }
-  const op = document.getElementById('adj-op').value;
-  const it = items.find(i => i.fbKey === adjTarget);
-  const old = it.qty;
-  let newQty = op === 'add' ? Math.round((it.qty+val)*100)/100 : op === 'sub' ? Math.max(0, Math.round((it.qty-val)*100)/100) : val;
-  update(ref(db, 'storage/items/' + adjTarget), { qty: newQty })
-    .then(() => {
-      const lbl = op==='add'?'прихід':op==='sub'?'витрата':'встановлено';
-      showToast(`✓ ${it.name}: ${old} → ${newQty} ${it.unit} (${lbl})`, 'ok');
-      document.getElementById('adj-q').value = '';
-      document.getElementById('adj-val').value = '';
-      adjTarget = null;
-    })
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
-};
-
-// ===== FILTERS =====
-window.setZone = function(el) {
-  document.querySelectorAll('.ztab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  curZone = el.dataset.z;
-  renderTable();
-};
-
-window.filterByZone = function(zname) {
-  curZone = zname;
-  document.querySelectorAll('.ztab').forEach(t => t.classList.toggle('active', t.dataset.z === zname));
-  renderTable();
-  // Scroll to table on mobile
-  const card = document.querySelector('.layout > div:last-child');
-  if (card && window.innerWidth <= 768) card.scrollIntoView({ behavior:'smooth' });
-};
-
-window.toggleFilter = function(el, f) {
-  if (activeFilters.has(f)) { activeFilters.delete(f); el.classList.remove('active-red','active-yellow'); }
-  else { activeFilters.add(f); el.classList.add(f === 'empty' ? 'active-red' : 'active-yellow'); }
-  renderTable();
-};
-
-window.toggleMarkerFilter = function(color) {
-  markerFilter = markerFilter === color ? null : color;
-  ['green','yellow','red'].forEach(c => {
-    const btn = document.getElementById('fpill-' + c);
-    if (btn) btn.classList.remove('active-green','active-yellow','active-red');
-  });
-  if (markerFilter) {
-    const btn = document.getElementById('fpill-' + markerFilter);
-    const cls = markerFilter === 'green' ? 'active-green' : markerFilter === 'yellow' ? 'active-yellow' : 'active-red';
-    if (btn) btn.classList.add(cls);
-  }
-  renderTable();
-};
-
-window.sortBy = function(f) {
-  if (sortF === f) sortD *= -1; else { sortF = f; sortD = 1; }
-  renderTable();
-};
-
-// ===== TG BAR =====
-function updateTgBar() {
-  const marked = items.filter(i => i.marker === 'red' || i.marker === 'yellow');
-  const redItems = marked.filter(i => i.marker === 'red');
-  const yellowItems = marked.filter(i => i.marker === 'yellow');
-
-  const rcEl = document.getElementById('tg-rc');
-  const ycEl = document.getElementById('tg-yc');
-  const rbadge = document.getElementById('tg-red-count');
-  const ybadge = document.getElementById('tg-yellow-count');
-  const noneLabel = document.getElementById('tg-none-label');
-  const sendBtn = document.getElementById('btn-send-tg');
-
-  if (rcEl) rcEl.textContent = redItems.length;
-  if (ycEl) ycEl.textContent = yellowItems.length;
-  if (rbadge) rbadge.style.display = redItems.length ? 'inline-flex' : 'none';
-  if (ybadge) ybadge.style.display = yellowItems.length ? 'inline-flex' : 'none';
-  if (noneLabel) noneLabel.style.display = marked.length ? 'none' : 'inline';
-  if (sendBtn) { sendBtn.disabled = marked.length === 0; sendBtn.style.opacity = marked.length ? '1' : '0.4'; }
+function utb(){
+  const ri=items.filter(i=>i.marker==='red'),yi=items.filter(i=>i.marker==='yellow');
+  const rce=document.getElementById('tgrc'),yce=document.getElementById('tgyc'),nle=document.getElementById('tgnone'),be=document.getElementById('btntg');
+  const rne=document.getElementById('tgrn'),yne=document.getElementById('tgyn');
+  if(rne)rne.textContent=ri.length;if(yne)yne.textContent=yi.length;
+  if(rce)rce.style.display=ri.length?'inline-flex':'none';
+  if(yce)yce.style.display=yi.length?'inline-flex':'none';
+  if(nle)nle.style.display=(ri.length||yi.length)?'none':'inline';
+  if(be){be.disabled=!(ri.length||yi.length);be.style.opacity=(ri.length||yi.length)?'1':'.4';}
 }
 
-// ===== RENDER TABLE =====
-function renderTable() {
-  const q = document.getElementById('search-inp').value.toLowerCase();
-  let list = items.filter(it => {
-    if (curZone !== 'all' && it.zone !== curZone) return false;
-    if (q && !it.name.toLowerCase().includes(q) && !(it.category||'').toLowerCase().includes(q) && !(it.sku||'').toLowerCase().includes(q)) return false;
-    if (markerFilter && it.marker !== markerFilter) return false;
-    if (activeFilters.has('empty') && it.qty > 0) return false;
-    if (activeFilters.has('low') && (it.qty===0||it.minQty===0||it.qty>=it.minQty)) return false;
+window.rt=rt;
+function rt(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  let list=items.filter(it=>{
+    if(curZ!=='all'&&it.zone!==curZ)return false;
+    if(q&&!it.name.toLowerCase().includes(q)&&!(it.category||'').toLowerCase().includes(q))return false;
+    if(mF&&it.marker!==mF)return false;
+    if(aF.has('empty')&&it.qty>0)return false;
+    if(aF.has('low')&&(it.qty===0||!it.minQty||it.qty>=it.minQty))return false;
     return true;
   });
+  list.sort((a,b)=>{let av=a[sF],bv=b[sF];if(sF==='expiry'){av=av?new Date(av).getTime():Infinity;bv=bv?new Date(bv).getTime():Infinity;}else if(typeof av==='string'){av=av.toLowerCase();bv=bv.toLowerCase();}return av>bv?sD:av<bv?-sD:0;});
+  const tb=document.getElementById('tbody'),em=document.getElementById('emst');
+  if(!list.length){tb.innerHTML='';if(em)em.style.display='block';utb();return;}
+  if(em)em.style.display='none';
 
-  list.sort((a,b) => {
-    let av=a[sortF], bv=b[sortF];
-    if (sortF==='expiry') { av=av?new Date(av).getTime():Infinity; bv=bv?new Date(bv).getTime():Infinity; }
-    else if (typeof av==='string') { av=av.toLowerCase(); bv=bv.toLowerCase(); }
-    return av>bv?sortD:av<bv?-sortD:0;
-  });
-
-  const tbody = document.getElementById('tbody');
-  const emptyEl = document.getElementById('empty-st');
-  if (!list.length) { tbody.innerHTML=''; if(emptyEl) emptyEl.style.display='block'; updateTgBar(); return; }
-  if (emptyEl) emptyEl.style.display='none';
-
-  tbody.innerHTML = list.map(it => {
-    const zMeta = Object.values(zones).find(z => z.name === it.zone);
-    const zColor = zMeta?.color || '#3d2b1a';
-    const zIcon = zMeta?.icon || '📦';
-    const pct = it.minQty > 0 ? Math.min(100, (it.qty/it.minQty)*100) : 100;
-    const barColor = it.qty===0 ? '#e74c3c' : pct < 50 ? '#b8943a' : '#5a7a5c';
-
-    let qtyClass = 'qty-num';
-    let sbClass = 'sb-ok', sbText = 'В НАЯВНОСТІ', dotCls = 'dot-ok';
-    const es = expiryStatus(it.expiry);
-    if (it.qty === 0) { qtyClass='qty-num empty'; sbClass='sb-empty'; sbText='ВІДСУТНІЙ'; dotCls='dot-empty'; }
-    else if (it.minQty > 0 && it.qty < it.minQty) { qtyClass='qty-num low'; sbClass='sb-low'; sbText='МАЛИЙ ЗАПАС'; dotCls='dot-low'; }
-    if (es === 'expired' && it.qty > 0) { sbClass='sb-expire'; sbText='ПРОСТРОЧЕНО'; dotCls='dot-expire'; }
-    else if (es === 'soon' && it.qty > 0 && sbClass === 'sb-ok') { sbClass='sb-expire'; sbText='ТЕРМІН СПЛИВАЄ'; dotCls='dot-expire'; }
-
-    let expiryHtml = '<span class="exp-none">—</span>';
-    if (it.expiry) {
-      const d = daysLeft(it.expiry);
-      const dateStr = new Date(it.expiry).toLocaleDateString('uk-UA');
-      if (d < 0) expiryHtml = `<span class="exp-expired">⚠ ${dateStr}<span class="exp-days">Прострочено ${Math.abs(d)} дн.</span></span>`;
-      else if (d <= 3) expiryHtml = `<span class="exp-soon">⏰ ${dateStr}<span class="exp-days">Залишилось ${d} дн.</span></span>`;
-      else expiryHtml = `<span class="exp-ok">${dateStr}<span class="exp-days" style="color:#aaa;font-weight:400">Ще ${d} дн.</span></span>`;
-    }
-
-    // Marker
-    const marker = it.marker || null;
-    const rowClass = marker ? `mark-${marker}` : '';
-
-    // Order qty
-    const hasOrderQty = it.orderQty && it.orderQty !== '' && it.orderQty !== '0';
-    const key = it.fbKey;
-
-    return `<tr class="${rowClass}">
-      <td>
-        <span class="prod-name">${it.name}</span>
-        <span class="prod-meta">${it.category||''}${it.sku?' · <b>'+it.sku+'</b>':''}${it.note?' · '+it.note:''}</span>
+  tb.innerHTML=list.map(it=>{
+    const zm=Object.values(zones).find(z=>z.name===it.zone);
+    const col=zm?.color||'#888',ico=zm?.icon||'📦';
+    const pct=it.minQty>0?Math.min(100,(it.qty/it.minQty)*100):100;
+    const bc=it.qty===0?'var(--red)':pct<50?'var(--gold)':'var(--sage)';
+    const qcl='qn'+(it.qty===0?' zero':it.minQty>0&&it.qty<it.minQty?' low':'');
+    const mk=it.marker||null;
+    const step=(it.unit==='г'||it.unit==='мл')?50:(it.unit==='шт'||it.unit==='пляш'||it.unit==='упак'||it.unit==='пач')?1:0.5;
+    const hoq=it.orderQty&&it.orderQty!=='0'&&it.orderQty!=='';
+    const k=it.fbKey;
+    const es=eS(it.expiry);
+    const exs=it.expiry?` <span style="font-size:10px;color:${es==='exp'?'var(--red)':es==='soon'?'#e67e22':'#bbb'};">${es==='exp'?'⚠️':es==='soon'?'⏰':''}${new Date(it.expiry).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'})}</span>`:'';
+    return `<tr class="${mk?'mk-'+mk:''}">
+      <td><div class="pn" onclick="openEd('${k}')">${it.name}</div><div class="pm">${it.category||''}${exs}</div></td>
+      <td><span class="zchip" style="background:${col}18;color:${col};">${ico} ${it.zone}</span></td>
+      <td id="qc-${k}" class="qcell" onclick="startQE('${k}')" title="Натисніть щоб змінити">
+        <div class="qdisp"><span class="${qcl}">${it.qty}</span><span class="qu">${it.unit}</span></div>
+        ${it.minQty>0?`<div class="qbar"><div class="qbf" style="width:${pct}%;background:${bc};"></div></div>`:''}
+        <div class="qhint">✎ змінити</div>
       </td>
+      <td><div class="mkrw">
+        <button class="mkr g ${mk==='green'?'on':''}" onclick="setMark('${k}','green')" title="🟢 В наявності">✓</button>
+        <button class="mkr y ${mk==='yellow'?'on':''}" onclick="setMark('${k}','yellow')" title="🟡 Під контроль">✓</button>
+        <button class="mkr r ${mk==='red'?'on':''}" onclick="setMark('${k}','red')" title="🔴 Критично">✓</button>
+      </div></td>
       <td>
-        <span class="zbadge" style="background:${zColor}18;color:${zColor};">${zIcon} ${it.zone}</span>
-      </td>
-      <td id="qty-cell-${key}" class="qty-wrap">
-        <div class="qty-display" onclick="startQtyEdit('${key}')" title="Натисніть щоб редагувати">
-          <span class="${qtyClass}">${it.qty}</span>
-          <span class="qty-unit">${it.unit}</span>
+        <div class="step ${hoq?'hv':''}">
+          <button class="sb" onclick="stepQ('${k}',-1)">−</button>
+          <input type="number" min="0" step="${step}" value="${it.orderQty||''}" placeholder="—"
+            oninput="setOQ('${k}',this.value)"/>
+          <button class="sb" onclick="stepQ('${k}',1)">+</button>
         </div>
-        ${it.minQty>0 ? `<div class="qty-bar"><div class="qty-bar-fill" style="width:${pct}%;background:${barColor};"></div></div><div style="font-size:10px;color:#bbb;margin-top:2px;">мін: ${it.minQty}</div>` : ''}
-        <div class="qty-edit-hint">✎ натисніть</div>
+        <div class="stpu">${it.unit}</div>
       </td>
-      <td class="expiry-cell">${expiryHtml}</td>
-      <td><span class="sbadge ${sbClass}"><span class="dot ${dotCls}"></span>${sbText}</span></td>
-      <td>
-        <div class="marker-wrap" style="justify-content:center;">
-          <button class="marker-btn mb-green ${marker==='green'?'active':''}" onclick="setMarker('${key}','green')" title="🟢 В наявності">
-            ${marker==='green' ? '✓' : ''}
-          </button>
-          <button class="marker-btn mb-yellow ${marker==='yellow'?'active':''}" onclick="setMarker('${key}','yellow')" title="🟡 Взяти під контроль">
-            ${marker==='yellow' ? '✓' : ''}
-          </button>
-          <button class="marker-btn mb-red ${marker==='red'?'active':''}" onclick="setMarker('${key}','red')" title="🔴 Критично малий залишок">
-            ${marker==='red' ? '✓' : ''}
-          </button>
-        </div>
-      </td>
-      <td>
-        <div class="order-qty-wrap">
-          <input
-            class="order-qty-inp ${hasOrderQty?'has-val':''}"
-            type="number" min="0" step="0.1"
-            value="${it.orderQty||''}"
-            placeholder="кільк."
-            oninput="setOrderQty('${key}', this.value)"
-            title="Кількість для замовлення"
-          />
-          ${hasOrderQty ? `<div style="font-size:10px;color:#888;margin-top:2px;">→ ${it.orderQty} ${it.unit}</div>` : ''}
-        </div>
-      </td>
-      <td class="row-actions">
-        <button class="btn btn-outline-sage btn-sm" onclick="openEdit('${key}')">✏️</button>
-        <button class="btn btn-outline-red btn-sm" onclick="deleteItem('${key}')">✕</button>
-      </td>
+      <td><div class="ract">
+        <button class="btn sage sm" onclick="openEd('${k}')">✏️</button>
+        <button class="btn del sm" onclick="delIt('${k}')">✕</button>
+      </div></td>
     </tr>`;
   }).join('');
-
-  updateTgBar();
+  utb();
 }
+window.delIt=function(k){const it=items.find(i=>i.fbKey===k);if(!it||!confirm(`Видалити "${it.name}"?`))return;remove(ref(db,'storage/items/'+k)).then(()=>toast('Видалено')).catch(er=>toast('Помилка: '+er.message,'err'));};
 
-// ===== STATS =====
-function updateStats() {
-  document.getElementById('s-total').textContent = items.length;
-  document.getElementById('s-zones').textContent = Object.keys(zones).length;
-  document.getElementById('s-green').textContent = items.filter(i => i.marker === 'green').length;
-  document.getElementById('s-yellow').textContent = items.filter(i => i.marker === 'yellow').length;
-  document.getElementById('s-red').textContent = items.filter(i => i.marker === 'red').length;
+function uStats(){
+  document.getElementById('s-total').textContent=items.length;
+  document.getElementById('s-zones').textContent=Object.keys(zones).length;
+  document.getElementById('s-green').textContent=items.filter(i=>i.marker==='green').length;
+  document.getElementById('s-yellow').textContent=items.filter(i=>i.marker==='yellow').length;
+  document.getElementById('s-red').textContent=items.filter(i=>i.marker==='red').length;
 }
+function ra(){rt();rzOv();rzTabs();uStats();}
 
-function renderAll() {
-  renderTable();
-  renderZoneOverview();
-  renderZoneTabs();
-  updateStats();
+// TG
+window.openTgSet=function(){document.getElementById('tg-tok').value=tok;document.getElementById('tg-cid').value=cid;document.getElementById('tg-tres').style.display='none';document.getElementById('m-tgset').classList.add('on');};
+window.tgSave=function(){tok=document.getElementById('tg-tok').value.trim();cid=document.getElementById('tg-cid').value.trim();set(sRef,{tgToken:tok,tgChatId:cid}).then(()=>{cm();toast('✓ Збережено','ok');}).catch(er=>toast('Помилка: '+er.message,'err'));};
+window.tgTest=async function(){
+  const t2=document.getElementById('tg-tok').value.trim(),c2=document.getElementById('tg-cid').value.trim(),rb=document.getElementById('tg-tres');
+  if(!t2||!c2){rb.style.cssText='display:block;background:#fde8e8;color:var(--red);padding:9px;border-radius:6px;font-size:12px;font-weight:600;';rb.textContent='Заповніть Token і Chat ID';return;}
+  rb.style.cssText='display:block;background:#fef5e0;color:var(--gold);padding:9px;border-radius:6px;font-size:12px;font-weight:600;';rb.textContent='Надсилаємо...';
+  try{const r=await fetch(`https://api.telegram.org/bot${t2}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:c2,text:'🐑 Тест ✅',parse_mode:'HTML'})});const d=await r.json();if(d.ok){rb.style.background='#e8f5e8';rb.style.color='var(--sage)';rb.textContent='✅ Надіслано!';}else{rb.style.background='#fde8e8';rb.style.color='var(--red)';rb.textContent='❌ '+(d.description||'помилка');}}catch(er){rb.style.background='#fde8e8';rb.style.color='var(--red)';rb.textContent='❌ '+er.message;}
+};
+
+function bMsg(){
+  const ri=items.filter(i=>i.marker==='red'),yi=items.filter(i=>i.marker==='yellow');
+  const now=new Date().toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  let m=`🐑 <b>ЗАМОВЛЕННЯ ПРОДУКТІВ</b>\n📅 ${now}\n${'─'.repeat(26)}\n`;
+  function bz(list,hd){if(!list.length)return;m+=`\n${hd}\n`;const bzo={};list.forEach(it=>{const z=it.zone||'Без зони';if(!bzo[z])bzo[z]=[];bzo[z].push(it);});Object.entries(bzo).forEach(([z,zi])=>{const zm=Object.values(zones).find(x=>x.name===z);m+=`\n  ${zm?.icon||'📦'} <i>${z}</i>\n`;zi.forEach(it=>{const q=it.orderQty?` → <b>${it.orderQty} ${it.unit}</b>`:'';m+=`  • ${it.name} (є: ${it.qty} ${it.unit})${q}\n`;});});}
+  bz(ri,'🔴 <b>КРИТИЧНО:</b>');bz(yi,'🟡 <b>ПІД КОНТРОЛЬ:</b>');
+  m+=`\n${'─'.repeat(26)}\n🔴 ${ri.length} + 🟡 ${yi.length} позицій`;
+  return m;
 }
-
-// ===== TELEGRAM =====
-window.openTgSettings = function() {
-  document.getElementById('tg-token').value = tgToken;
-  document.getElementById('tg-chatid').value = tgChatId;
-  document.getElementById('tg-test-result').style.display = 'none';
-  document.getElementById('tg-settings-modal').classList.add('open');
+window.openTgSend=function(){
+  if(!tok||!cid){toast('Налаштуйте Telegram!','err');openTgSet();return;}
+  const ri=items.filter(i=>i.marker==='red'),yi=items.filter(i=>i.marker==='yellow');
+  document.getElementById('tgmr').textContent=`🔴 ${ri.length} критично`;
+  document.getElementById('tgmy').textContent=`🟡 ${yi.length} під контроль`;
+  document.getElementById('tgprev').textContent=bMsg().replace(/<[^>]+>/g,'');
+  document.getElementById('tgsres').style.display='none';
+  document.getElementById('m-tgsend').classList.add('on');
+};
+window.tgSend=async function(){
+  const b=document.getElementById('btnsend'),rb=document.getElementById('tgsres');
+  b.disabled=true;b.textContent='Надсилаємо...';
+  try{const r=await fetch(`https://api.telegram.org/bot${tok}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:bMsg(),parse_mode:'HTML'})});const d=await r.json();rb.style.display='block';if(d.ok){rb.style.cssText='display:block;background:#e8f5e8;color:var(--sage);padding:9px;border-radius:6px;font-size:13px;font-weight:600;';rb.innerHTML='✅ Надіслано!';b.textContent='✓';setTimeout(cm,1600);}else{rb.style.cssText='display:block;background:#fde8e8;color:var(--red);padding:9px;border-radius:6px;font-size:13px;font-weight:600;';rb.textContent='❌ '+(d.description||'помилка');b.disabled=false;b.textContent='Надіслати';}}catch(er){rb.style.cssText='display:block;background:#fde8e8;color:var(--red);padding:9px;border-radius:6px;font-size:13px;font-weight:600;';rb.textContent='❌ '+er.message;b.disabled=false;b.textContent='Надіслати';}
 };
 
-window.saveTgSettings = function() {
-  tgToken = document.getElementById('tg-token').value.trim();
-  tgChatId = document.getElementById('tg-chatid').value.trim();
-  set(settingsRef, { tgToken, tgChatId })
-    .then(() => { closeModals(); showToast('✓ Налаштування Telegram збережено', 'ok'); })
-    .catch(e => showToast('Помилка: ' + e.message, 'err'));
+// PRINT
+window.printAll=function(){
+  const now=new Date(),ds=now.toLocaleDateString('uk-UA',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}),ts=now.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+  const q=document.getElementById('srch').value.toLowerCase();
+  let list=items.filter(it=>(curZ==='all'||it.zone===curZ)&&(!q||it.name.toLowerCase().includes(q)));
+  list.sort((a,b)=>a.name.localeCompare(b.name,'uk'));
+  const bzo={};list.forEach(it=>{if(!bzo[it.zone])bzo[it.zone]=[];bzo[it.zone].push(it);});
+  let h=`<div class="ph"><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:26px;">🐑</span><div><div class="pt">Зони зберігання</div><div class="ps">Контроль продуктів</div></div></div><div class="pm">📅 ${ds}<br>🕐 ${ts}<br>📦 ${list.length} поз.</div></div>`;
+  Object.values(zones).forEach(zm=>{const zi=bzo[zm.name];if(!zi?.length)return;h+=`<div class="pzb"><div class="pzt">${zm.icon} ${zm.name}</div><table class="ptbl"><thead><tr><th style="width:42%">Продукт</th><th style="width:10%;text-align:center">Маркер</th><th style="width:18%;text-align:center">Залишок</th><th>Дозамовити</th></tr></thead><tbody>${zi.map(it=>`<tr><td>${it.name}</td><td style="text-align:center">${it.marker==='red'?'🔴':it.marker==='yellow'?'🟡':it.marker==='green'?'🟢':''}</td><td style="text-align:center;font-weight:700;${it.qty===0?'color:#c0392b;':it.minQty>0&&it.qty<it.minQty?'color:#b8943a;':''}">${it.qty} ${it.unit}</td><td>${it.orderQty?`${it.orderQty} ${it.unit}`:''}</td></tr>`).join('')}</tbody></table></div>`;});
+  h+=`<div class="pf"><span>🐑 Зони зберігання</span><span>${ds}, ${ts}</span></div>`;
+  document.getElementById('pa').innerHTML=h;window.print();
 };
-
-window.testTelegram = async function() {
-  const token = document.getElementById('tg-token').value.trim();
-  const chatId = document.getElementById('tg-chatid').value.trim();
-  const resBox = document.getElementById('tg-test-result');
-  if (!token || !chatId) { resBox.style.display='block'; resBox.style.background='#fde8e8'; resBox.style.color='var(--red)'; resBox.textContent='Заповніть Token і Chat ID'; return; }
-  resBox.style.display='block'; resBox.style.background='#fef5e0'; resBox.style.color='var(--gold)'; resBox.textContent='Надсилаємо тестове повідомлення...';
-  try {
-    const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ chat_id: chatId, text:'🐑 Зони зберігання — тестове з\'єднання успішне! ✅', parse_mode:'HTML' })
-    });
-    const data = await r.json();
-    if (data.ok) { resBox.style.background='#e8f5e8'; resBox.style.color='var(--sage)'; resBox.textContent='✅ Повідомлення надіслано успішно!'; }
-    else { resBox.style.background='#fde8e8'; resBox.style.color='var(--red)'; resBox.textContent='❌ Помилка: ' + (data.description||'невідома'); }
-  } catch(e) { resBox.style.background='#fde8e8'; resBox.style.color='var(--red)'; resBox.textContent='❌ Помилка мережі: ' + e.message; }
-};
-
-function buildOrderMessage() {
-  const redItems = items.filter(i => i.marker === 'red');
-  const yellowItems = items.filter(i => i.marker === 'yellow');
-  const now = new Date().toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  let msg = `🐑 <b>ЗАМОВЛЕННЯ ПРОДУКТІВ</b>\n📅 ${now}\n${'─'.repeat(28)}\n`;
-
-  if (redItems.length) {
-    msg += `\n🔴 <b>КРИТИЧНО — ЗАМОВИТИ ТЕРМІНОВО:</b>\n`;
-    const byZone = {};
-    redItems.forEach(it => { const zn = it.zone||'Без зони'; if(!byZone[zn]) byZone[zn]=[]; byZone[zn].push(it); });
-    Object.entries(byZone).forEach(([zn, zItems]) => {
-      const zm = Object.values(zones).find(z => z.name === zn);
-      msg += `\n  ${zm?.icon||'📦'} <i>${zn}</i>\n`;
-      zItems.forEach(it => {
-        const qtyStr = it.orderQty ? ` → замовити: <b>${it.orderQty} ${it.unit}</b>` : '';
-        msg += `  • ${it.name} (є: ${it.qty} ${it.unit})${qtyStr}\n`;
-      });
-    });
-  }
-
-  if (yellowItems.length) {
-    msg += `\n🟡 <b>ПІД КОНТРОЛЬ:</b>\n`;
-    const byZone = {};
-    yellowItems.forEach(it => { const zn = it.zone||'Без зони'; if(!byZone[zn]) byZone[zn]=[]; byZone[zn].push(it); });
-    Object.entries(byZone).forEach(([zn, zItems]) => {
-      const zm = Object.values(zones).find(z => z.name === zn);
-      msg += `\n  ${zm?.icon||'📦'} <i>${zn}</i>\n`;
-      zItems.forEach(it => {
-        const qtyStr = it.orderQty ? ` → замовити: <b>${it.orderQty} ${it.unit}</b>` : '';
-        msg += `  • ${it.name} (є: ${it.qty} ${it.unit})${qtyStr}\n`;
-      });
-    });
-  }
-
-  msg += `\n${'─'.repeat(28)}\n`;
-  msg += `📦 Всього: 🔴 ${redItems.length} крит. + 🟡 ${yellowItems.length} контроль`;
-  return msg;
-}
-
-window.openTgSend = function() {
-  if (!tgToken || !tgChatId) { showToast('Спочатку налаштуйте Telegram-бот!', 'err'); openTgSettings(); return; }
-  const redItems = items.filter(i => i.marker === 'red');
-  const yellowItems = items.filter(i => i.marker === 'yellow');
-  document.getElementById('tg-modal-red').textContent = `🔴 ${redItems.length} критично`;
-  document.getElementById('tg-modal-yellow').textContent = `🟡 ${yellowItems.length} під контроль`;
-  const previewText = buildOrderMessage().replace(/<[^>]+>/g,'');
-  document.getElementById('tg-preview').textContent = previewText;
-  document.getElementById('tg-send-result').style.display = 'none';
-  document.getElementById('tg-send-modal').classList.add('open');
-};
-
-window.sendToTelegram = async function() {
-  const btn = document.getElementById('btn-do-send');
-  const resBox = document.getElementById('tg-send-result');
-  btn.disabled = true; btn.textContent = 'Надсилаємо...';
-  try {
-    const r = await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ chat_id: tgChatId, text: buildOrderMessage(), parse_mode:'HTML' })
-    });
-    const data = await r.json();
-    resBox.style.display = 'block';
-    if (data.ok) {
-      resBox.style.background='#e8f5e8'; resBox.style.color='var(--sage)';
-      resBox.innerHTML='✅ Замовлення успішно надіслано!';
-      btn.textContent='✓ Надіслано';
-      setTimeout(closeModals, 2000);
-    } else {
-      resBox.style.background='#fde8e8'; resBox.style.color='var(--red)';
-      resBox.textContent='❌ Помилка Telegram: ' + (data.description||'невідома');
-      btn.disabled=false; btn.textContent='Надіслати';
-    }
-  } catch(e) {
-    resBox.style.display='block'; resBox.style.background='#fde8e8'; resBox.style.color='var(--red)';
-    resBox.textContent='❌ Помилка мережі: ' + e.message;
-    btn.disabled=false; btn.textContent='Надіслати';
-  }
-};
-
-// ===== PRINT =====
-window.printTable = function() {
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('uk-UA', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
-  const timeStr = now.toLocaleTimeString('uk-UA', { hour:'2-digit', minute:'2-digit' });
-  const q = document.getElementById('search-inp').value.toLowerCase();
-  let list = items.filter(it => {
-    if (curZone !== 'all' && it.zone !== curZone) return false;
-    if (q && !it.name.toLowerCase().includes(q)) return false;
-    return true;
-  });
-  list.sort((a,b) => a.name.localeCompare(b.name, 'uk'));
-  const byZone = {};
-  list.forEach(it => { if(!byZone[it.zone]) byZone[it.zone]=[]; byZone[it.zone].push(it); });
-  let html = `<div class="print-header"><div class="print-logo"><span style="font-size:32px;">🐑</span><div><div class="print-title">Зони зберігання</div><div class="print-subtitle">Контроль продуктів · Ресторан</div></div></div><div class="print-meta">📅 ${dateStr}<br>🕐 ${timeStr}<br>📦 Позицій: ${list.length}</div></div>`;
-  Object.values(zones).forEach(zm => {
-    const zItems = byZone[zm.name];
-    if (!zItems?.length) return;
-    html += `<div class="print-zone-block"><div class="print-zone-title">${zm.icon} ${zm.name}</div><table class="print-table"><thead><tr><th class="col-name">Назва продукту</th><th class="col-marker">Маркер</th><th class="col-qty" style="text-align:center;">Залишок</th><th class="col-note">Нотатка / замовлення</th></tr></thead><tbody>${
-      zItems.map(it => {
-        let qtyClass = 'col-qty';
-        if (it.qty===0) qtyClass += ' empty';
-        else if (it.minQty>0 && it.qty<it.minQty) qtyClass += ' low';
-        const markerDot = it.marker === 'red' ? '🔴' : it.marker === 'yellow' ? '🟡' : it.marker === 'green' ? '🟢' : '';
-        const orderNote = it.orderQty ? `Замовити: ${it.orderQty} ${it.unit}` : '';
-        return `<tr><td class="col-name">${it.name}${it.note?`<div style="font-size:10px;color:#999;">${it.note}</div>`:''}</td><td class="col-marker" style="text-align:center;">${markerDot}</td><td class="${qtyClass}">${it.qty} ${it.unit}${it.minQty>0?`<div style="font-size:10px;font-weight:400;color:#aaa;">мін: ${it.minQty}</div>`:''}</td><td class="col-note">${orderNote}</td></tr>`;
-      }).join('')
-    }</tbody></table></div>`;
-  });
-  html += `<div class="print-footer"><span>🐑 Зони зберігання — Ресторан</span><span>Надруковано: ${dateStr}, ${timeStr}</span></div>`;
-  document.getElementById('print-area').innerHTML = html;
+window.printZone=function(zn){
+  const zm=Object.values(zones).find(z=>z.name===zn)||{icon:'📦'};
+  const zi=items.filter(i=>i.zone===zn).sort((a,b)=>a.name.localeCompare(b.name,'uk'));
+  const now=new Date(),ds=now.toLocaleDateString('uk-UA',{day:'2-digit',month:'long',year:'numeric'}),ts=now.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('pa').innerHTML=`<div class="ph"><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:26px;">${zm.icon}</span><div><div class="pt">${zn}</div><div class="ps">Зони зберігання</div></div></div><div class="pm">📅 ${ds}<br>🕐 ${ts}<br>📦 ${zi.length} поз.</div></div><table class="ptbl"><thead><tr><th style="width:42%">Продукт</th><th style="width:10%;text-align:center">Маркер</th><th style="width:18%;text-align:center">Залишок</th><th>Дозамовити</th></tr></thead><tbody>${zi.map(it=>`<tr><td>${it.name}</td><td style="text-align:center">${it.marker==='red'?'🔴':it.marker==='yellow'?'🟡':it.marker==='green'?'🟢':''}</td><td style="text-align:center;font-weight:700;">${it.qty} ${it.unit}</td><td>${it.orderQty?`${it.orderQty} ${it.unit}`:''}</td></tr>`).join('')}</tbody></table><div class="pf"><span>🐑 ${zn}</span><span>${ds}, ${ts}</span></div>`;
   window.print();
 };
 
-window.printZone = function(zoneName) {
-  const zm = Object.values(zones).find(z => z.name === zoneName) || { icon:'📦' };
-  const zItems = items.filter(i => i.zone === zoneName).sort((a,b) => a.name.localeCompare(b.name,'uk'));
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('uk-UA', { day:'2-digit', month:'long', year:'numeric' });
-  const timeStr = now.toLocaleTimeString('uk-UA', { hour:'2-digit', minute:'2-digit' });
-  const rows = zItems.map(it => {
-    let qtyClass = 'col-qty';
-    if (it.qty===0) qtyClass+=' empty';
-    else if (it.minQty>0&&it.qty<it.minQty) qtyClass+=' low';
-    const markerDot = it.marker==='red'?'🔴':it.marker==='yellow'?'🟡':it.marker==='green'?'🟢':'';
-    const orderNote = it.orderQty ? `Замовити: ${it.orderQty} ${it.unit}` : '';
-    return `<tr><td class="col-name">${it.name}${it.note?`<div style="font-size:10px;color:#999;">${it.note}</div>`:''}</td><td class="col-marker" style="text-align:center;">${markerDot}</td><td class="${qtyClass}">${it.qty} ${it.unit}${it.minQty>0?`<div style="font-size:10px;font-weight:400;color:#aaa;">мін: ${it.minQty}</div>`:''}</td><td class="col-note">${orderNote}</td></tr>`;
-  }).join('');
-  document.getElementById('print-area').innerHTML = `<div class="print-header"><div class="print-logo"><span style="font-size:32px;">${zm.icon}</span><div><div class="print-title">${zoneName}</div><div class="print-subtitle">Зони зберігання · Ресторан</div></div></div><div class="print-meta">📅 ${dateStr}<br>🕐 ${timeStr}<br>📦 Позицій: ${zItems.length}</div></div><table class="print-table"><thead><tr><th class="col-name">Назва продукту</th><th class="col-marker">Маркер</th><th class="col-qty" style="text-align:center;">Залишок</th><th class="col-note">Помітка / замовлення</th></tr></thead><tbody>${rows}</tbody></table><div class="print-footer"><span>🐑 Зони зберігання — Ресторан</span><span>Надруковано: ${dateStr}, ${timeStr}</span></div>`;
-  window.print();
-};
+window.cm=function(){document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));};
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',ev=>{if(ev.target===o)cm();}));
 
-// ===== CLOSE MODALS =====
-window.closeModals = function() {
-  document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
-};
-document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) closeModals(); }));
+function toast(msg,tp=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(tp?tp+' ':'')+'show';clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3000);}
 
-// ===== TOAST =====
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast ' + type + ' show';
-  setTimeout(() => t.classList.remove('show'), 3500);
-}
+// SIDEBAR MOBILE
+let sOpen=false;
+function initSide(){const c=document.getElementById('scoll');if(window.innerWidth<=768){c.style.maxHeight='0';c.style.opacity='0';sOpen=false;}else{c.style.maxHeight='';c.style.opacity='';}}
+window.tgSide=function(){const c=document.getElementById('scoll'),b=document.getElementById('stog');sOpen=!sOpen;c.style.maxHeight=sOpen?c.scrollHeight+'px':'0';c.style.opacity=sOpen?'1':'0';if(b)b.classList.toggle('open',sOpen);};
+window.addEventListener('resize',initSide);initSide();
 
-// ===== SIDEBAR MOBILE =====
-let sidebarOpen = false;
-function initSidebar() {
-  const content = document.getElementById('sidebar-content');
-  const isMobile = window.innerWidth <= 768;
-  if (isMobile) { content.style.maxHeight='0px'; content.style.opacity='0'; sidebarOpen=false; }
-  else { content.style.maxHeight=''; content.style.opacity=''; }
-}
-window.toggleSidebar = function() {
-  const content = document.getElementById('sidebar-content');
-  const btn = document.getElementById('sidebar-btn');
-  sidebarOpen = !sidebarOpen;
-  if (sidebarOpen) { content.style.maxHeight=content.scrollHeight+'px'; content.style.opacity='1'; if(btn) btn.classList.add('open'); }
-  else { content.style.maxHeight='0px'; content.style.opacity='0'; if(btn) btn.classList.remove('open'); }
-};
-window.addEventListener('resize', initSidebar);
-initSidebar();
-
-// Initial loading
-document.getElementById('tbody').innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:#aaa;font-size:13px;">🔄 Завантаження даних з Firebase...</td></tr>`;
-
+document.getElementById('tbody').innerHTML=`<tr><td colspan="6" style="text-align:center;padding:36px;color:#ccc;font-size:13px;">🔄 Завантаження...</td></tr>`;
 </script>
 </body>
 </html>
